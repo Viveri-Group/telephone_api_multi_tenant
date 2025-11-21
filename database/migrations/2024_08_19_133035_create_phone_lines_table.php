@@ -1,0 +1,24 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('competition_phone_lines', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('competition_id')->constrained('competitions');
+            $table->string('phone_number',12);
+            $table->string('cost')->comment('the cost of the call to the caller.');
+            $table->softDeletes();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('competition_phone_lines');
+    }
+};

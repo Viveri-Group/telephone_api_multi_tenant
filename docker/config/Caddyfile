@@ -1,0 +1,14 @@
+:80
+
+root * /var/www/html/public
+file_server
+
+php_fastcgi itv-api-web:9000
+
+# Health check endpoints
+@healthcheck {
+    path /healthy /health-check
+}
+respond @healthcheck 200 {
+    body "OK"
+}

@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Http\Resources\Web;
+
+use App\Action\File\GetCompetitionDefaultAudioAction;
+use App\Enums\CompetitionAudioType;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class WebCompetitionResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        $this->resource->loadMissing(['phoneLines', 'files']);
+
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'is_open' => $this->isOpen,
+            'start' => $this->start->toIso8601String(),
+            'end' => $this->end->toIso8601String(),
+
+            'type' => $this->type,
+            'special_offer' => $this->special_offer,
+            'entries_warning' => $this->entries_warning,
+            'max_paid_entries' => $this->max_paid_entries,
+            'created_at' => $this->created_at,
+            'phone_lines' => WebPhoneLineResource::collection($this->phoneLines),
+            'files' => WebFileUploadResource::collection($this->files),
+            'default_audio' => (new GetCompetitionDefaultAudioAction(CompetitionAudioType::names()))->handle()
+        ];
+    }
+}

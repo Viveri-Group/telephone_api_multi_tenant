@@ -1,0 +1,49 @@
+on:
+  pull_request:
+name: Pull Requests
+
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    container:
+      image: kirschbaumdevelopment/laravel-test-runner:8.3
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: itv_telephone_api_test
+        ports:
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install additional PHP extensions
+        run:  |
+          apt-get update --fix-missing --allow-releaseinfo-change
+          apt-get install -y php8.3-pcov
+
+      - name: Install composer dependencies
+        run: composer install --no-scripts --no-progress --prefer-dist
+
+      - name: Prepare Laravel Application
+        run: |
+          cp .env.ci .env
+          php artisan key:generate
+
+      - name: Run Testsuite
+        run: php artisan test --parallel --coverage --coverage-clover=./coverage/clover.xml
+
+      - name: Coverage Report as Comment (Clover)
+        uses: lucassabreu/comment-coverage-clover@main
+        with:
+          table-below-coverage: 70
+          file: ./coverage/clover.xml
+          github-token: ${{secrets.GITHUB_TOKEN}}

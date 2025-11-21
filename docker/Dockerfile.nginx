@@ -1,0 +1,21 @@
+FROM public.ecr.aws/nginx/nginx:alpine
+
+LABEL maintainer="Robert Hartles" 
+
+ENV NGINX_ENTRYPOINT_QUIET_LOGS=1
+
+COPY docker/config/nginx.conf /etc/nginx/nginx.conf
+
+COPY public /var/www/html/public
+
+WORKDIR /var/www/html/public
+
+# Fix permissions before switching users
+RUN chown -R nginx:nginx /var/cache/nginx /var/www/html/public
+
+# Remove Nginx User for now
+# USER nginx
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,16 @@
+[
+    {
+        "file_number": "1",
+        "total_file_number": 536870913,
+        "file": "00000001_test.wav",
+        "name": "test.wav",
+        "area": "GLOBAL"
+    },
+    {
+        "file_number": "2",
+        "total_file_number": 536870914,
+        "file": "00000002_foo.wav",
+        "name": "foo.wav",
+        "area": "GLOBAL"
+    }
+]

@@ -1,0 +1,68 @@
+name: Build and Push App Docker Image
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'docker/Dockerfile.nginx'
+      - 'docker/config/nginx.conf'
+      - 'docker/config/nginx-local.conf'
+      - 'docker/Dockerfile.worker'
+      - 'docker/config/supervisord.conf'
+      - '.github/workflows/nginx-build.yml'
+      - '.github/workflows/build-worker-image.yml'
+  workflow_dispatch:
+
+env:
+  ECR_REGISTRY: 756455520547.dkr.ecr.eu-west-2.amazonaws.com
+  ECR_REPOSITORY_APP: viveri/itv-telephone-api
+
+jobs:
+  build-and-push-app:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: eu-west-2
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+      env:
+        AWS_REGION: eu-west-2
+
+    - name: Generate timestamp
+      id: timestamp
+      run: echo "timestamp=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+    - name: Build and push app image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./docker/Dockerfile
+        push: true
+        tags: |
+          ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_APP }}:latest
+          ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_APP }}:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Output image details
+      run: |
+        echo "App image pushed successfully!"
+        echo "Repository: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_APP }}"
+        echo "Tags:"
+        echo "  - latest"
+        echo "  - ${{ github.sha }}"
