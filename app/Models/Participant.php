@@ -32,6 +32,11 @@ class Participant extends Model
         });
     }
 
+    public function organisation(): BelongsTo
+    {
+        return $this->belongsTo(Organisation::class);
+    }
+
     public function competition(): BelongsTo
     {
         return $this->belongsTo(Competition::class);
