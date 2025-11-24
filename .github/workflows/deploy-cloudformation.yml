@@ -5,6 +5,7 @@ on:
     workflows: ["Build and Push App Docker Image"]
     types:
       - completed
+  workflow_dispatch:
 
 env:
   AWS_REGION: eu-west-2
@@ -78,7 +79,23 @@ jobs:
         else
           # Check if the error is "No updates are to be performed"
           if grep -q "No updates are to be performed" /tmp/update-output.txt; then
-            echo "No changes detected in the stack template"
+            echo "No CloudFormation changes detected, but forcing ECS service update to pull latest images..."
+            
+            # Force new deployment for app service to pull latest image
+            aws ecs update-service \
+              --cluster multi-tenant-service-blue \
+              --service multi-tenant-app-service-blue \
+              --force-new-deployment \
+              --region ${{ env.AWS_REGION }}
+            
+            # Force new deployment for worker service to pull latest image
+            aws ecs update-service \
+              --cluster multi-tenant-service-blue \
+              --service multi-tenant-worker-service-blue \
+              --force-new-deployment \
+              --region ${{ env.AWS_REGION }}
+            
+            echo "Forced new deployment for app and worker services"
             exit 0
           else
             echo "Stack update failed"

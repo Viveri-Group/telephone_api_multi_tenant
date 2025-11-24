@@ -11,6 +11,7 @@ on:
       - 'docker/config/supervisord.conf'
       - '.github/workflows/nginx-build.yml'
       - '.github/workflows/build-worker-image.yml'
+      - '.github/workflows/deploy-cloudformation.yml'
   workflow_dispatch:
 
 env:
