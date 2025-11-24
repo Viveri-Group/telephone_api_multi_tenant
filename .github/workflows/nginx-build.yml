@@ -48,5 +48,3 @@ jobs:
           ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_NGINX }}:latest
           ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_NGINX }}:${{ github.sha }}
           ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_NGINX }}:multi-tenant-${{ env.DATE_TAG }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
