@@ -3,6 +3,7 @@
 namespace Tests\Feature\API\Competition;
 
 use App\Models\Competition;
+use App\Models\Organisation;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -17,6 +18,8 @@ class CompetitionTest extends TestCase
         $this->login();
 
         Carbon::setTestNow('2024-01-01 09:00:00');
+
+        $this->organisation = Organisation::factory()->create();
     }
     public function test_can_get_competitions()
     {
@@ -110,6 +113,7 @@ class CompetitionTest extends TestCase
         $this->assertCount(0, Competition::all());
 
         $this->post(route('competition.create'), [
+            'organisation_id' => $this->organisation->id,
             'name' => 'Test Competition',
             'start' => $start,
             'end' => $end,
@@ -145,6 +149,7 @@ class CompetitionTest extends TestCase
         $this->assertCount(0, Competition::all());
 
         $this->post(route('competition.create'), [
+            'organisation_id' => $this->organisation->id,
             'name' => 'Test Competition',
             'start' => $start,
             'end' => $end,
@@ -181,6 +186,7 @@ class CompetitionTest extends TestCase
         $this->assertCount(0, Competition::all());
 
         $this->post(route('competition.create'), [
+            'organisation_id' => $this->organisation->id,
             'name' => 'Test Competition',
             'start' => $start,
             'end' => $end,
@@ -206,6 +212,7 @@ class CompetitionTest extends TestCase
         $this->assertCount(0, Competition::all());
 
         $this->post(route('competition.create'), [
+            'organisation_id' => $this->organisation->id,
             'name' => 'Test Competition',
             'start' => now()->subDays(5),
             'end' => now()->subDay(),
@@ -256,6 +263,7 @@ class CompetitionTest extends TestCase
         $updatedEnd = now()->addDays(2);
 
         $competition = Competition::factory()->create([
+            'organisation_id' => $this->organisation->id,
             'name' => 'Test Competition',
             'start' => $start,
             'end' => $end,
@@ -265,6 +273,7 @@ class CompetitionTest extends TestCase
         $this->assertCount(1, Competition::all());
 
         $this->post(route('competition.update', $competition), [
+            'organisation_id' => $this->organisation->id,
             'name' => 'Test Competition FOO',
             'start' => $updatedStart,
             'end' => $updatedEnd,
@@ -302,6 +311,7 @@ class CompetitionTest extends TestCase
         $updatedEnd = now()->addDays(2);
 
         $competition = Competition::factory()->create([
+            'organisation_id' => $this->organisation->id,
             'name' => 'Test Competition',
             'start' => $start,
             'end' => $end,
@@ -311,6 +321,7 @@ class CompetitionTest extends TestCase
         $this->assertCount(1, Competition::all());
 
         $this->post(route('competition.update', $competition), [
+            'organisation_id' => $this->organisation->id,
             'name' => 'Test Competition FOO',
             'start' => $updatedStart,
             'end' => $updatedEnd,
@@ -347,9 +358,10 @@ class CompetitionTest extends TestCase
             ->assertJson(function (AssertableJson $json) {
                 return $json
                     ->has('message')
-                    ->where('data.0.source', 'name')
-                    ->where('data.1.source', 'start')
-                    ->where('data.2.source', 'end')
+                    ->where('data.0.source', 'organisation_id')
+                    ->where('data.1.source', 'name')
+                    ->where('data.2.source', 'start')
+                    ->where('data.3.source', 'end')
                     ->etc();
             });
     }
@@ -357,6 +369,7 @@ class CompetitionTest extends TestCase
     public function test_cannot_create_with_invalid_special_offer()
     {
         $this->post(route('competition.create'), [
+            'organisation_id' => $this->organisation->id,
             'name' => 'Test Competition',
             'start' => now(),
             'end' => now()->addDay(),

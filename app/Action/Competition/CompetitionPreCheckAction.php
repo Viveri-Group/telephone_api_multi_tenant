@@ -74,6 +74,7 @@ class CompetitionPreCheckAction
 
         if ($recordActiveCall) {
             $activeCall = ActiveCall::create([
+                'organisation_id' => $phoneLine->organisation_id,
                 'competition_id' => $phoneLine->competition->id,
                 'competition_phone_line_id' => $phoneLine->id,
                 'call_id' => $requestDetails->callID,

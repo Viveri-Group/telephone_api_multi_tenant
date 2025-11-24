@@ -16,6 +16,7 @@ class CreateEntryController extends Controller
         CreateEntryJob::dispatchAfterResponse(
             new ActiveCallDTO(
                 $activeCall->id,
+                $activeCall->organisation_id,
                 $activeCall->competition_id,
                 $activeCall->call_id,
                 $activeCall->participant_id,

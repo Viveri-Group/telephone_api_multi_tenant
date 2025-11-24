@@ -18,9 +18,10 @@ class ValidationExceptionTest extends TestCase
             ->assertUnprocessable()
             ->assertJson(function (AssertableJson $json) {
                 return $json
-                    ->where('message', 'The name field is required. (and 1 more error)')
-                    ->where('data.0.source', 'name')
-                    ->where('data.1.source', 'start')
+                    ->has('message')
+                    ->where('data.0.source', 'organisation_id')
+                    ->where('data.1.source', 'name')
+                    ->where('data.2.source', 'start')
                     ->etc();
             });
     }

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Organisation;
 use App\Models\PhoneLineSchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
@@ -13,6 +14,7 @@ class PhoneLineScheduleFactory extends Factory
     public function definition(): array
     {
         return [
+            'organisation_id' => Organisation::factory(),
             'author_id' => 1,
             'competition_id' => 1,
             'competition_phone_number' => $this->faker->numerify('44##########'),

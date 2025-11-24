@@ -16,6 +16,7 @@ class CreateParticipantFromActiveCallDTOAction
         $participant = Participant::create([
             'call_id' => $activeCallDTO->call_id,
             'call_start' => $activeCallDTO->created_at,
+            'organisation_id' => $activeCallDTO->organisation_id,
             'competition_id' => $activeCallDTO->competition_id,
             'cli_presentation' => $activeCallDTO->cli_presentation,
             'competition_phone_number' => $activeCallDTO->competition_phone_number,

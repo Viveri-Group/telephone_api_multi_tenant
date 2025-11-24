@@ -4,6 +4,7 @@ namespace Tests\Feature\API\PhoneLine;
 
 use App\Models\Competition;
 use App\Models\CompetitionPhoneLine;
+use App\Models\Organisation;
 use App\Models\PhoneBookEntry;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -17,13 +18,15 @@ class PhoneLineTest extends TestCase
 
         $this->login();
 
-        $this->competition = Competition::factory()->create();
+        $this->organisation = Organisation::factory()->create();
 
-        PhoneBookEntry::factory()->create(['phone_number' => '07222333333', 'cost' => '1.50']);
-        PhoneBookEntry::factory()->create(['phone_number' => '07222555555', 'cost' => '1.50']);
-        PhoneBookEntry::factory()->create(['phone_number' => '07222666666', 'cost' => '1.50']);
-        PhoneBookEntry::factory()->create(['phone_number' => '072227777777', 'cost' => '1.50']);
-        PhoneBookEntry::factory()->create(['phone_number' => '07555333333', 'cost' => '1.50']);
+        $this->competition = Competition::factory(['organisation_id' => $this->organisation->id])->create();
+
+        PhoneBookEntry::factory()->create(['phone_number' => '07222333333', 'cost' => '1.50', 'organisation_id' => $this->organisation->id]);
+        PhoneBookEntry::factory()->create(['phone_number' => '07222555555', 'cost' => '1.50', 'organisation_id' => $this->organisation->id]);
+        PhoneBookEntry::factory()->create(['phone_number' => '07222666666', 'cost' => '1.50', 'organisation_id' => $this->organisation->id]);
+        PhoneBookEntry::factory()->create(['phone_number' => '072227777777', 'cost' => '1.50', 'organisation_id' => $this->organisation->id]);
+        PhoneBookEntry::factory()->create(['phone_number' => '07555333333', 'cost' => '1.50', 'organisation_id' => $this->organisation->id]);
     }
 
     public function test_can_create_phone_line()
@@ -40,6 +43,21 @@ class PhoneLineTest extends TestCase
             $this->assertSame('07222555555', $line->phone_number);
             $this->assertSame($this->competition->id, $line->competition_id);
         });
+    }
+
+    public function test_cant_create_phone_line_if_comp_and_phone_book_entry_org_id_mismatch()
+    {
+        $orgB = Organisation::factory()->create();
+
+        PhoneBookEntry::factory()->create(['phone_number' => '441111111111', 'cost' => '1.50', 'organisation_id' => $orgB->id]);
+
+        $this->assertCount(0, CompetitionPhoneLine::all());
+
+        $this->post(route('phone-line.create', $this->competition), [
+            'phone_number' => '441111111111',
+        ])->assertConflict();
+
+        $this->assertCount(0, CompetitionPhoneLine::all());
     }
 
     public function test_cant_create_phone_line_not_in_phone_book()

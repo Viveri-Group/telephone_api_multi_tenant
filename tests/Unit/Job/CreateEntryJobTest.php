@@ -22,6 +22,7 @@ class CreateEntryJobTest extends TestCase
 
         $activeCallDTO = new ActiveCallDTO(
             $activeCall->id,
+            $activeCall->organisation_id,
             $activeCall->competition_id,
             $activeCall->call_id,
             $activeCall->participant_id,
@@ -96,6 +97,7 @@ class CreateEntryJobTest extends TestCase
 
         $activeCallDTO = new ActiveCallDTO(
             $activeCall->id,
+            $activeCall->organisation_id,
             $activeCall->competition_id,
             $activeCall->call_id,
             $activeCall->participant_id,
