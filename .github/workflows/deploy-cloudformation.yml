@@ -63,13 +63,18 @@ jobs:
       run: |
         echo "Updating existing CloudFormation stack: ${{ env.STACK_NAME }}"
         
-        # Try to update the stack
-        if aws cloudformation update-stack \
+        # Try to update the stack and capture both stdout and stderr
+        set +e  # Don't exit on error
+        aws cloudformation update-stack \
           --stack-name ${{ env.STACK_NAME }} \
           --template-body file://${{ env.TEMPLATE_FILE }} \
           --capabilities CAPABILITY_IAM \
-          --region ${{ env.AWS_REGION }} 2>&1 | tee /tmp/update-output.txt; then
-          
+          --region ${{ env.AWS_REGION }} 2>&1 | tee /tmp/update-output.txt
+        
+        UPDATE_EXIT_CODE=$?
+        set -e  # Re-enable exit on error
+        
+        if [ $UPDATE_EXIT_CODE -eq 0 ]; then
           echo "Waiting for stack update to complete..."
           aws cloudformation wait stack-update-complete \
             --stack-name ${{ env.STACK_NAME }} \
@@ -96,9 +101,8 @@ jobs:
               --region ${{ env.AWS_REGION }}
             
             echo "Forced new deployment for app and worker services"
-            exit 0
           else
-            echo "Stack update failed"
+            echo "Stack update failed with unexpected error"
             cat /tmp/update-output.txt
             exit 1
           fi
