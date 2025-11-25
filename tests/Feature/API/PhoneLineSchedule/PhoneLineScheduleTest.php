@@ -3,6 +3,7 @@
 namespace Tests\Feature\API\PhoneLineSchedule;
 
 use App\Models\Competition;
+use App\Models\Organisation;
 use App\Models\PhoneBookEntry;
 use App\Models\PhoneLineSchedule;
 use Illuminate\Support\Carbon;
@@ -11,10 +12,17 @@ use Tests\TestCase;
 
 class PhoneLineScheduleTest extends TestCase
 {
-    public function test_can_get_specific_schedule()
+    public function setUp(): void
     {
+        parent::setUp();
+
         $this->login();
 
+        $this->organisation = Organisation::factory()->create();
+    }
+
+    public function test_can_get_specific_schedule()
+    {
         PhoneBookEntry::factory()->create(['phone_number' => '441234567897']);
         PhoneBookEntry::factory()->create(['phone_number' => '445555555555']);
 
@@ -29,8 +37,6 @@ class PhoneLineScheduleTest extends TestCase
 
     public function test_can_get_all_schedules()
     {
-        $this->login();
-
         PhoneBookEntry::factory()->create(['phone_number' => '441234567897']);
         PhoneBookEntry::factory()->create(['phone_number' => '445555555555']);
 
@@ -45,8 +51,6 @@ class PhoneLineScheduleTest extends TestCase
 
     public function test_can_get_all_schedules_relating_to_a_number()
     {
-        $this->login();
-
         PhoneBookEntry::factory()->create(['phone_number' => '441234567897']);
         PhoneBookEntry::factory()->create(['phone_number' => '445555555555']);
 
@@ -65,13 +69,12 @@ class PhoneLineScheduleTest extends TestCase
 
     public function test_can_create_a_schedule()
     {
-        $this->login();
-
         $competition = Competition::factory()->create();
 
         PhoneBookEntry::factory()->create(['phone_number' => '441234567897']);
 
         $this->postJson(route('phone-number-schedule.create'), [
+            'organisation_id' => $this->organisation->id,
             'competition_id' => $competition->id,
             'competition_phone_number' => '441234567897',
             'action_at' => now()->addMinute()->format('Y-m-d\TH:i:s\Z'),
@@ -81,8 +84,6 @@ class PhoneLineScheduleTest extends TestCase
 
     public function test_cant_create_a_schedule_with_an_unknown_number()
     {
-        $this->login();
-
         $competition = Competition::factory()->create();
 
         $this->postJson(route('phone-number-schedule.create'), [
@@ -101,7 +102,7 @@ class PhoneLineScheduleTest extends TestCase
 
     public function test_cant_create_a_schedule_whereby_a_number_and_action_at_already_exist()
     {
-        $this->login();
+
 
         $competition = Competition::factory()->create();
 
@@ -127,7 +128,7 @@ class PhoneLineScheduleTest extends TestCase
     {
         Carbon::setTestNow('2025-09-09 08:00:00');
 
-        $this->login();
+
 
         $competition = Competition::factory()->create();
 
@@ -145,7 +146,7 @@ class PhoneLineScheduleTest extends TestCase
 
     public function test_validation()
     {
-        $this->login();
+
 
         $this->postJson(route('phone-number-schedule.create'))
             ->assertUnprocessable()
@@ -160,7 +161,7 @@ class PhoneLineScheduleTest extends TestCase
 
     public function test_can_delete_a_schedule()
     {
-        $this->login();
+
 
         $schedule = PhoneLineSchedule::factory()->create(['processed' => '0']);
 
@@ -170,7 +171,7 @@ class PhoneLineScheduleTest extends TestCase
 
     public function test_cant_delete_a_schedule_when_its_already_been_processed()
     {
-        $this->login();
+
 
         $schedule = PhoneLineSchedule::factory()->create(['processed' => '1']);
 
@@ -180,7 +181,7 @@ class PhoneLineScheduleTest extends TestCase
 
     public function test_cant_delete_a_non_existent_schedule()
     {
-        $this->login();
+
 
         $this->deleteJson(route('phone-number-schedule.delete', 22))
             ->assertNotFound();

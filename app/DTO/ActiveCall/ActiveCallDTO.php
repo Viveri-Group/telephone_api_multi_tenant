@@ -6,6 +6,7 @@ class ActiveCallDTO
 {
     public function __construct(
         public int $id,
+        public int $organisation_id,
         public ?int $competition_id,
         public int $call_id,
         public ?int $participant_id,

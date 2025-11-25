@@ -7,7 +7,7 @@ import {Link, usePage} from '@inertiajs/vue3';
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
         <div v-if="usePage().props.config.show_logo_to_guests">
             <Link :href="route('login')">
-                <ApplicationLogo class="w-auto h-12" />
+                <ApplicationLogo class="w-auto h-12" :show-color="true"/>
             </Link>
         </div>
 

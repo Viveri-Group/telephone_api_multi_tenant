@@ -31,6 +31,7 @@ class HandleCompetitionFailClearDownJob implements ShouldQueue
 
             // 2. create failed entry
             FailedEntry::create([
+                'organisation_id' => $this->activeCallDTO->organisation_id,
                 'competition_id' => $this->activeCallDTO->competition_id,
                 'call_id' => $this->activeCallDTO->call_id,
                 'phone_number' => $this->activeCallDTO->competition_phone_number,

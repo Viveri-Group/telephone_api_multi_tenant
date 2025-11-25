@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Action\Organisation\GetOrganisationsAction;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Env;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => new UserResource($request->user()),
                 'flash' => fn () => $request->session()->get('flash-data'),
                 'environment' => app()->environment(),
+                'organisations' => (new GetOrganisationsAction())->handle(),
             ],
             'config' => [
                 'show_logo_to_guests' => config('system.show_logo_to_guests'),
