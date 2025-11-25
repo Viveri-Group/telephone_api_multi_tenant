@@ -5,6 +5,9 @@ import LayoutBox from "@/Components/Layout/LayoutBox.vue";
 import Select from "@/Components/Form/Select.vue"
 import {useForm} from "@inertiajs/vue3";
 import {onMounted} from "vue";
+import useOrganisationSelect from "@/Composables/useOrganisationSelect.js";
+
+const { organisationSelectData } = useOrganisationSelect();
 
 const props = defineProps({
     defaultSearchFormOptions: Object,
@@ -12,6 +15,7 @@ const props = defineProps({
 });
 
 const form = useForm({
+    organisation_id: '',
     competition_id: '',
     call_id:'',
     phone_number: '',
@@ -50,6 +54,15 @@ const clearForm = () => {
         <SearchContainer heading="Search Non Entries" storage-key="hide_failed_entries_search_panel">
             <form @submit.prevent="submit">
                 <div class="grid grid-cols-12 gap-x-4 gap-y-1">
+                    <Select label="Organisation"
+                            name="organisation"
+                            tip="The organisation the non entry belongs to."
+                            :has-default="true"
+                            :options="organisationSelectData"
+                            v-model="form.organisation_id"
+                            class="col-span-12 sm:col-span-6 xl:col-span-4"
+                    ></Select>
+
                     <Input label="Competition ID"
                            name="competition_id"
                            tip="The ID of the competition."
@@ -69,7 +82,7 @@ const clearForm = () => {
                             :has-default="true"
                             :options="props.defaultSearchFormOptions.reasons"
                             v-model="form.reason"
-                            class="col-span-12 sm:col-span-12 xl:col-span-8"
+                            class="col-span-12 sm:col-span-6 xl:col-span-4"
                     ></Select>
 
                     <Input label="Competition Phone Number"

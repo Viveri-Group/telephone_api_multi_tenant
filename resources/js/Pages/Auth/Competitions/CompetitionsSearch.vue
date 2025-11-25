@@ -2,9 +2,12 @@
 import Input from "@/Components/Form/Input.vue";
 import SearchContainer from "@/Components/Layout/SearchContainer.vue";
 import LayoutBox from "@/Components/Layout/LayoutBox.vue";
-import Select from "@/Components/Form/Select.vue"
 import {useForm} from "@inertiajs/vue3";
 import {onMounted} from "vue";
+import useOrganisationSelect from "@/Composables/useOrganisationSelect.js";
+import Select from "@/Components/Form/Select.vue";
+
+const { organisationSelectData } = useOrganisationSelect();
 
 const props = defineProps({
     defaultSearchFormOptions: Object,
@@ -12,6 +15,7 @@ const props = defineProps({
 });
 
 const form = useForm({
+    organisation_id: '',
     id: '',
     name: '',
     type: '',
@@ -48,11 +52,20 @@ const clearForm = () => {
         <SearchContainer heading="Search Competitions" storage-key="hide_competition_search_panel">
             <form @submit.prevent="submit">
                 <div class="grid grid-cols-12 gap-x-4 gap-y-1">
+                    <Select label="Organisation"
+                            name="organisation"
+                            tip="The organisation the competition belongs to."
+                            :has-default="true"
+                            :options="organisationSelectData"
+                            v-model="form.organisation_id"
+                            class="col-span-12 sm:col-span-6 xl:col-span-4"
+                    ></Select>
+
                     <Input label="Name"
                            name="name"
                            tip="The name of the competition."
                            v-model="form.name"
-                           class="col-span-6 sm:col-span-6 xl:col-span-6"
+                           class="col-span-12 sm:col-span-6 xl:col-span-8"
                     ></Input>
 
                     <Input label="Date From"

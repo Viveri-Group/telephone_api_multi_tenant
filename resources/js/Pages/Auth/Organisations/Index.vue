@@ -1,14 +1,12 @@
 <script setup>
-import {Head} from "@inertiajs/vue3";
+import {Head, usePage} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Info from "@/Components/Layout/Info.vue";
 import LayoutBox from "@/Components/Layout/LayoutBox.vue";
 import Tip from "@/Components/Tip/Tip.vue";
 import OrganisationsDetails from "@/Pages/Auth/Organisations/OrganisationsDetails.vue";
 
-const props = defineProps({
-    organisations: Object,
-});
+const organisations = usePage().props.auth.organisations;
 </script>
 
 <template>
@@ -43,9 +41,9 @@ const props = defineProps({
                     </div>
                 </div>
 
-                <template v-for="(organisation, index) in props.organisations.data">
-                    <OrganisationsDetails :organisation="organisation" :even="!!(index % 2)"
-                                         :index="index"></OrganisationsDetails>
+                <template v-for="(organisation, index) in organisations">
+                    <OrganisationsDetails :organisation="organisation" :even="!!(index % 2)" :index="index">
+                    </OrganisationsDetails>
                 </template>
             </div>
         </LayoutBox>

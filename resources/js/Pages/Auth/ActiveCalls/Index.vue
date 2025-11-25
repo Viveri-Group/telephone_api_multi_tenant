@@ -17,7 +17,7 @@ const props = defineProps({
     activeCalls: Object,
     defaultSearchFormOptions: Object,
     enableMaxLines: Boolean,
-    maxActiveLines: Number
+    maxActiveLines: String
 });
 
 const interval = 30;

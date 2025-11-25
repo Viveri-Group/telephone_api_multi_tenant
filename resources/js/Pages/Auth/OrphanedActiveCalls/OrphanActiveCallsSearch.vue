@@ -5,6 +5,9 @@ import LayoutBox from "@/Components/Layout/LayoutBox.vue";
 import Select from "@/Components/Form/Select.vue"
 import {useForm} from "@inertiajs/vue3";
 import {onMounted} from "vue";
+import useOrganisationSelect from "@/Composables/useOrganisationSelect.js";
+
+const { organisationSelectData } = useOrganisationSelect();
 
 const props = defineProps({
     defaultSearchFormOptions: Object,
@@ -12,6 +15,7 @@ const props = defineProps({
 });
 
 const form = useForm({
+    organisation_id: '',
     competition_id: '',
     call_id: '',
     caller_phone_number: '',
@@ -50,6 +54,15 @@ const clearForm = () => {
         <SearchContainer heading="Search Orphaned Active Calls" storage-key="hide_orphan_active_search_search_panel">
             <form @submit.prevent="submit">
                 <div class="grid grid-cols-12 gap-x-4 gap-y-1">
+                    <Select label="Organisation"
+                            name="organisation"
+                            tip="The organisation the orphan call belongs to."
+                            :has-default="true"
+                            :options="organisationSelectData"
+                            v-model="form.organisation_id"
+                            class="col-span-12 sm:col-span-6 xl:col-span-4"
+                    ></Select>
+
                     <Input label="Competition ID"
                            name="competition_id"
                            tip="The ID of the competition."
