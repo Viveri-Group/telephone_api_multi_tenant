@@ -28,7 +28,6 @@ Route::middleware('auth:sanctum')->scopeBindings()->group(function () {
     Route::post('/active-call/{activeCall}/clear-down', ActiveCallClearDownController::class)->name('active-call.clear-down');
 
     Route::post('/download/competition/{competition}/entrants', EntrantsDownloadController::class)->name('download.entrants');
-    Route::get('/entrant/{participant:uuid}/audio', EntrantAudioDownloadController::class)->name('entrant.audio');
 
     Route::get('/phone-book/entry', [PhoneBookEntryController::class, 'index'])->name('phone-book.entry.index');
     Route::get('/phone-book/entry/{phoneBookEntry}', [PhoneBookEntryController::class, 'show'])->name('phone-book.entry.show');
