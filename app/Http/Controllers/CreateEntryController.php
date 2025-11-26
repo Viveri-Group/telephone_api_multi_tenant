@@ -31,8 +31,7 @@ class CreateEntryController extends Controller
                 null,
                 $activeCall->created_at,
                 $activeCall->updated_at
-            ),
-            $request->filled('create_free_entry') && $request->boolean('create_free_entry')
+            )
         );
 
         return response(status: 200);

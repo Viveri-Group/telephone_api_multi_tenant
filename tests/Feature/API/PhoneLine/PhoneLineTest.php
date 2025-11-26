@@ -49,7 +49,7 @@ class PhoneLineTest extends TestCase
     {
         $orgB = Organisation::factory()->create();
 
-        PhoneBookEntry::factory()->create(['phone_number' => '441111111111', 'cost' => '1.50', 'organisation_id' => $orgB->id]);
+        PhoneBookEntry::factory()->create(['phone_number' => '441111111111', 'organisation_id' => $orgB->id]);
 
         $this->assertCount(0, CompetitionPhoneLine::all());
 
