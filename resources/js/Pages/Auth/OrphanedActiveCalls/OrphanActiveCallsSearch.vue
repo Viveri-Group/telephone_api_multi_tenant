@@ -77,7 +77,6 @@ const clearForm = () => {
                            class="col-span-12 sm:col-span-6 xl:col-span-2"
                     ></Input>
 
-
                     <Select label="Competition Phone Number"
                             name="phone_number"
                             tip="The competition phone number."
