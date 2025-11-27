@@ -13,6 +13,7 @@ use App\Http\Controllers\CreateEntryController;
 use App\Http\Controllers\EntrantsDownloadController;
 use App\Http\Controllers\OrganisationController;
 use App\Http\Controllers\PhoneBookEntryController;
+use App\Http\Controllers\PhoneBookEntryOrganisationController;
 use App\Http\Controllers\PhoneBookLookupEntryController;
 use App\Http\Controllers\PhoneLineAvailabilityController;
 use App\Http\Controllers\PhoneLineController;
@@ -31,6 +32,7 @@ Route::middleware('auth:sanctum')->scopeBindings()->group(function () {
 
     Route::get('/phone-book/entry', [PhoneBookEntryController::class, 'index'])->name('phone-book.entry.index');
     Route::get('/phone-book/entry/{phoneBookEntry}', [PhoneBookEntryController::class, 'show'])->name('phone-book.entry.show');
+    Route::get('/phone-book/entry/organisation/{organisation}', [PhoneBookEntryOrganisationController::class, 'index'])->name('phone-book.entry.organisation.index');
 
     Route::get('/phone-book/lookup/entry/{phoneBookEntry:phone_number}', PhoneBookLookupEntryController::class)->name('phone-book.lookup.entry');
 
@@ -39,7 +41,7 @@ Route::middleware('auth:sanctum')->scopeBindings()->group(function () {
     Route::get('/competition', [CompetitionController::class, 'index'])->name('competition.index');
     Route::get('/competition/{competition}', [CompetitionController::class, 'show'])->name('competition.show');
     Route::post('/competition/create', [CompetitionController::class, 'store'])->name('competition.create');
-    Route::post('/competition/{competition}/update', [CompetitionController::class, 'update'])->name('competition.update');
+    Route::patch('/competition/{competition}/update', [CompetitionController::class, 'update'])->name('competition.update');
     Route::delete('/competition/{competition}/delete', [CompetitionController::class, 'destroy'])->name('competition.destroy');
 
     Route::get('/competition/{competition}/phone-line/{phoneLine}', [PhoneLineController::class, 'show'])->name('phone-line.show');

@@ -20,9 +20,8 @@ class CompetitionResource extends JsonResource
                 'start' => $this->start->toIso8601String(),
                 'end' => $this->end->toIso8601String(),
 
-                'max_paid_entries' => $this->max_paid_entries,
-                'entries_warning' => $this->entries_warning ?? 0,
                 'special_offer' => $this->special_offer,
+                'organisation_id' => $this->organisation_id,
             ],
             'relationships' => [
                 'phone_lines' => PhoneLineChildResource::collection($this->phoneLines),

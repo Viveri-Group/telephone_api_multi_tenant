@@ -15,4 +15,9 @@ class Organisation extends Model
     {
         return $this->hasMany(Competition::class);
     }
+
+    public function phoneBookEntries(): HasMany
+    {
+        return $this->hasMany(PhoneBookEntry::class);
+    }
 }
