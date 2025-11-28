@@ -41,7 +41,7 @@ Route::middleware('auth:sanctum')->scopeBindings()->group(function () {
     Route::get('/competition', [CompetitionController::class, 'index'])->name('competition.index');
     Route::get('/competition/{competition}', [CompetitionController::class, 'show'])->name('competition.show');
     Route::post('/competition/create', [CompetitionController::class, 'store'])->name('competition.create');
-    Route::patch('/competition/{competition}/update', [CompetitionController::class, 'update'])->name('competition.update');
+    Route::post('/competition/{competition}/update', [CompetitionController::class, 'update'])->name('competition.update');
     Route::delete('/competition/{competition}/delete', [CompetitionController::class, 'destroy'])->name('competition.destroy');
 
     Route::get('/competition/{competition}/phone-line/{phoneLine}', [PhoneLineController::class, 'show'])->name('phone-line.show');

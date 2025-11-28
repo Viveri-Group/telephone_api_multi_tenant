@@ -9,7 +9,7 @@ class CompetitionResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $this->resource->loadMissing(['phoneLines', 'winners', 'files', 'draws']);
+        $this->resource->loadMissing(['phoneLines', 'winners', 'files', 'draws', 'organisation']);
 
         return [
             'type' => 'competition',
@@ -21,9 +21,9 @@ class CompetitionResource extends JsonResource
                 'end' => $this->end->toIso8601String(),
 
                 'special_offer' => $this->special_offer,
-                'organisation_id' => $this->organisation_id,
             ],
             'relationships' => [
+                'organisation' => OrganisationResource::make($this->organisation),
                 'phone_lines' => PhoneLineChildResource::collection($this->phoneLines),
                 'winner' => WinnerResource::collection($this->winners),
                 'files' => FileUploadResource::collection($this->files),

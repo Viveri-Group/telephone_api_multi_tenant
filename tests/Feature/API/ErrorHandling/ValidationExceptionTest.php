@@ -13,7 +13,7 @@ class ValidationExceptionTest extends TestCase
 
         $this->post(route('competition.create'), [
             'end' => now()->addDay(),
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ])
             ->assertUnprocessable()
             ->assertJson(function (AssertableJson $json) {

@@ -39,7 +39,7 @@ class ApiRequestLogTest extends TestCase
             'name' => 'Test Competition',
             'start' => '2024-01-01 09:00:00',
             'end' => '2024-01-10 09:00:00',
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ])->assertCreated();
 
         $this->assertNotNull($response->headers->get('x-tracing-id'));
@@ -100,7 +100,7 @@ class ApiRequestLogTest extends TestCase
             'name' => 'Test Competition',
             'start' => '2024-01-01 09:00:00',
             'end' => '2024-01-10 09:00:00',
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
             'call_id' => '123456'
         ])->assertCreated();
 
@@ -134,7 +134,7 @@ class ApiRequestLogTest extends TestCase
             'name' => 'Test Competition',
             'start' => '2024-01-01 09:00:00',
             'end' => '2024-01-10 09:00:00',
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ])->assertCreated();
 
         $this->assertNotNull($response->headers->get('x-tracing-id'));

@@ -47,7 +47,7 @@ class CompetitionWholeValidationTest extends TestCase
             'name' => 'Test Competition',
             'start' => now()->setTime(15, 10),
             'end' => now()->setTime(15, 00)->addWeek(),
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ])
             ->assertCreated();
 

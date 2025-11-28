@@ -33,7 +33,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition A',
             'start' => $startA,
             'end' => $endA,
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ]);
 
         $competitionB = Competition::factory()->create([
@@ -71,7 +71,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition A PAGE 2',
             'start' => now()->addDay(),
             'end' => now()->addDays(2),
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ]);
 
         $competitionB = Competition::factory()->create([
@@ -84,7 +84,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition PAGE 1',
             'start' => now()->addDays(10),
             'end' => now()->addDays(11),
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ]);
 
         $this->get(route('competition.index', ['page' => 2]))
@@ -117,7 +117,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition',
             'start' => $start,
             'end' => $end,
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ])
             ->assertCreated()
             ->assertJson(function (AssertableJson $json) use($start, $end) {
@@ -153,7 +153,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition',
             'start' => $start,
             'end' => $end,
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
             'special_offer' => 'BOGOF'
         ])
             ->assertCreated()
@@ -190,7 +190,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition',
             'start' => $start,
             'end' => $end,
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ])
             ->assertUnprocessable()
             ->assertJson(function (AssertableJson $json) {
@@ -216,7 +216,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition',
             'start' => now()->subDays(5),
             'end' => now()->subDay(),
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ])
             ->assertCreated();
 
@@ -229,7 +229,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition',
             'start' => '2024-10-01 09:00:00',
             'end' => '2024-10-08 09:00:00',
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ]);
 
         $this->get(route('competition.show', $competition))
@@ -267,7 +267,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition',
             'start' => $start,
             'end' => $end,
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ]);
 
         $this->assertCount(1, Competition::all());
@@ -277,7 +277,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition FOO',
             'start' => $updatedStart,
             'end' => $updatedEnd,
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
             'special_offer' => 'BOGOF'
         ])
             ->assertOk()
@@ -315,7 +315,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition',
             'start' => $start,
             'end' => $end,
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ]);
 
         $this->assertCount(1, Competition::all());
@@ -325,7 +325,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition FOO',
             'start' => $updatedStart,
             'end' => $updatedEnd,
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ])
             ->assertConflict()
             ->assertJson(function (AssertableJson $json) {
@@ -340,7 +340,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition',
             'start' => '2024-01-01 15:00:00',
             'end' => '2024-01-02 15:00:00',
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
         ]);
 
         $this->assertCount(1, Competition::all());
@@ -373,7 +373,7 @@ class CompetitionTest extends TestCase
             'name' => 'Test Competition',
             'start' => now(),
             'end' => now()->addDay(),
-            'max_paid_entries' => 5,
+            'max_entries' => 5,
             'special_offer' => 'FOO'
         ])
             ->assertUnprocessable()

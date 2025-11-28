@@ -72,9 +72,9 @@ class CallerHistoryTest extends TestCase
     {
         $this->login();
 
-        $compA = Competition::factory(['max_paid_entries' => 10])->create();
-        $compB = Competition::factory(['max_paid_entries' => 20])->create();
-        $compC = Competition::factory(['max_paid_entries' => 30])->create();
+        $compA = Competition::factory(['max_entries' => 10])->create();
+        $compB = Competition::factory(['max_entries' => 20])->create();
+        $compC = Competition::factory(['max_entries' => 30])->create();
 
         $participants = [
             'B1' => Participant::factory(['call_id'=>1001,'competition_id' => $compB->id, 'telephone' => '441604123123', 'call_start' => now(), 'call_end' => now()->addMinute(), 'audio_file_number' => 123,])->create(),
