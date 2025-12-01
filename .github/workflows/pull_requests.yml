@@ -1,7 +1,11 @@
 on:
   pull_request:
-name: Pull Requests
 
+permissions:
+  pull-requests: write
+  issues: write
+
+name: Pull Requests
 
 jobs:
   phpunit:
@@ -46,4 +50,4 @@ jobs:
         with:
           table-below-coverage: 70
           file: ./coverage/clover.xml
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
