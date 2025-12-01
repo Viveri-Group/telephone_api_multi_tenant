@@ -5,13 +5,12 @@ namespace App\Http\Controllers;
 use App\Action\CapacityCheck\MaxLinesExceeded;
 use App\Action\Competition\CapacityCheckExceptionHandlerAction;
 use App\Action\Competition\CompetitionPreCheckAction;
-use App\Action\Competition\CompetitionPreCheckAction2;
 use App\Action\PhoneLine\PhoneNumberCleanupAction;
 use App\DTO\Competition\CompetitionPreCheckRequestDTO;
 use App\Enums\ResponseStatus;
 use App\Exceptions\CustomCompetitionHttpException;
-use App\Exceptions\ParticipantAlreadyOnActiveCallHTTPException;
 use App\Http\Resources\CompetitionCapacityCheckWithActivePhoneLineResource;
+use App\Jobs\UpdateActiveCallJob;
 use App\Models\ActiveCall;
 use App\Models\Competition;
 use App\Models\CompetitionPhoneLine;
@@ -77,5 +76,12 @@ class CapacityCheckController extends Controller
         }
 
         return $linesHaveBeenExceeded;
+    }
+
+    protected function handleUpdateActiveCallJob(Request $request, $response):void
+    {
+        if( !in_array($this->httpResponseStatus, [ResponseStatus::TOO_MANY->value, ResponseStatus::REJECT_CALLER->value])) {
+            UpdateActiveCallJob::dispatch($response->toArray($request));
+        }
     }
 }

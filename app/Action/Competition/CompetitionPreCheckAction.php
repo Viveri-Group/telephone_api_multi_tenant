@@ -110,7 +110,7 @@ class CompetitionPreCheckAction
                         406,
                         'Participant has exceeded allowed number of entries.',
                         [
-                            'competition' => $activeCompetition,
+                            'competition_id' => $activeCompetition->id,
                             'active_phone_line' => $activePhoneLine,
                             'status' => ResponseStatus::TOO_MANY->value,
                             'active_call_id' => $recordActiveCall ? $activeCall->id : null,

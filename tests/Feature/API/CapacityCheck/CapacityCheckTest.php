@@ -26,7 +26,7 @@ class CapacityCheckTest extends TestCase
 
         Config::set('bauer.MAX_NUMBER_OF_LINES', 50);
 
-        $competition = Competition::factory(['start' => now()->subDay(), 'end' => now()->addDay(), 'max_entries' => 1])
+        $competition = Competition::factory(['start' => now()->subDay(), 'end' => now()->addDay(), 'max_entries' => 2])
             ->hasPhoneLines(['phone_number' => '0333456555'])
             ->create();
 
@@ -39,9 +39,10 @@ class CapacityCheckTest extends TestCase
         ])
             ->assertOk()
             ->assertJson(function (AssertableJson $json) use ($competition) {
+                dd($json);
                 return $json
                     ->where('competition_id', $competition->id)
-                    ->where('sms_offer_enabled', false)
+                    ->where('sms_offer_enabled', 'FALSE')
                     ->where('INTRO', 1)
                     ->where('CLI_READOUT_NOTICE', 2)
                     ->where('DTMF_MENU', 3)
