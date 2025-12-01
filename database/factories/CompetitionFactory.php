@@ -18,7 +18,7 @@ class CompetitionFactory extends Factory
             'name' => $this->faker->name(),
             'start' => Carbon::now(),
             'end' => Carbon::now()->days(5),
-            'max_paid_entries' => 10,
+            'max_entries' => 10,
 
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),

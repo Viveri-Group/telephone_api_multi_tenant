@@ -14,6 +14,7 @@ class ParticipantResource extends JsonResource
             'id' => $this->id,
             'attributes' => [
                 'uuid' => $this->uuid,
+                'organisation_id' => $this->organisation_id,
                 'competition_id' => $this->competition_id,
                 'call_id' => $this->call_id,
                 'phone_line_id' => $this->competition_phone_line_id,

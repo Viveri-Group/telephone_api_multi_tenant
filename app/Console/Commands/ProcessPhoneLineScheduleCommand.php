@@ -46,6 +46,7 @@ class ProcessPhoneLineScheduleCommand extends Command
                             ->delete();
 
                         $competition->phoneLines()->create([
+                            'organisation_id' => $competition->organisation_id,
                             'phone_number' => $schedule->competition_phone_number,
                         ]);
 

@@ -24,7 +24,7 @@ class CallerHistoryController extends Controller
                 function (Participant $participant) use (&$previousCompetitionId, &$participantsEntryCount) {
                     $participantsEntryCount++;
 
-                    $compMaxEntries = $participant->competition->max_paid_entries;
+                    $compMaxEntries = $participant->competition->max_entries;
 
                     if ($previousCompetitionId === null) {
                         $isSameCompetition = false;

@@ -19,8 +19,8 @@ return new class extends Migration {
                 $table->index(['competition_id', 'telephone'], 'idx_participants_competition_id_telephone');
             }
 
-            if (!$indexes->pluck('INDEX_NAME')->contains('idx_participants_competition_call_deleted')) {
-                $table->index(['competition_id', 'call_start', 'deleted_at'], 'idx_participants_competition_call_deleted');
+            if (!$indexes->pluck('INDEX_NAME')->contains('idx_participants_competition_call')) {
+                $table->index(['competition_id', 'call_start'], 'idx_participants_competition_call');
             }
         });
     }

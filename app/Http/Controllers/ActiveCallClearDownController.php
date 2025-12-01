@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\DTO\ActiveCall\ActiveCallDTO;
-use App\Enums\CompetitionStatusEnum;
+use App\Enums\ClearDownStatus;
+use App\Enums\QueuePriority;
 use App\Http\Requests\ActiveCallClearDownRequest;
 use App\Jobs\HandleCompetitionClearDownSuccessJob;
 use App\Jobs\HandleCompetitionFailClearDownJob;
@@ -13,13 +14,27 @@ class ActiveCallClearDownController extends Controller
 {
     public function __invoke(ActiveCallClearDownRequest $request, ActiveCall $activeCall)
     {
-        $activeCallDTO = new ActiveCallDTO(
+        $activeCallDTO = $this->getDTO($activeCall);
+
+        match($request->input('type')){
+            ClearDownStatus::SUCCESS->value => HandleCompetitionClearDownSuccessJob::dispatch($activeCallDTO, $request->boolean('sms_offer_accepted'))->onQueue(QueuePriority::High->value),
+            ClearDownStatus::FAIL->value => HandleCompetitionFailClearDownJob::dispatch($activeCallDTO, $request->input('reason'))->onQueue(QueuePriority::High->value)
+        };
+
+        $activeCall->delete();
+
+        return response(status: 200);
+    }
+
+    protected function getDTO(ActiveCall $activeCall): ActiveCallDTO
+    {
+        return new ActiveCallDTO(
             $activeCall->id,
             $activeCall->organisation_id,
             $activeCall->competition_id,
             $activeCall->call_id,
             $activeCall->participant_id,
-            $activeCall->competition_phone_line_id,
+            $activeCall->competitionPhoneLine?->id,
             $activeCall->phone_number,
             $activeCall->caller_phone_number,
             $activeCall->status,
@@ -27,25 +42,9 @@ class ActiveCallClearDownController extends Controller
             $activeCall->round_end,
             now(),
             $activeCall->cli_presentation,
-            $request->input('recordFileNum'),
+            null,
             $activeCall->created_at,
             $activeCall->updated_at
         );
-
-        match($request->input('marker')){
-            CompetitionStatusEnum::COMP_OPEN_ANSWERED->value,
-            CompetitionStatusEnum::COMP_OPEN_RECORDING->value,
-            CompetitionStatusEnum::COMP_OPEN_COMPLETE->value,
-            CompetitionStatusEnum::EARLY_HANGUP_COMP_OPEN_RECORDING->value,
-
-            CompetitionStatusEnum::ABORTED_COMP_OPEN_RECORDING->value,
-            CompetitionStatusEnum::ABORTED_COMP_OPEN_ANSWERED->value,
-
-            CompetitionStatusEnum::EARLY_HANGUP_COMP_OPEN_ANSWERED->value => HandleCompetitionClearDownSuccessJob::dispatchAfterResponse($activeCallDTO),
-
-            default => HandleCompetitionFailClearDownJob::dispatchAfterResponse($activeCallDTO, $request->input('marker')),
-        };
-
-        return response(status: 200);
     }
 }

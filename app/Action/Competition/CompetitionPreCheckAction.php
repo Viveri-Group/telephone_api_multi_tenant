@@ -3,9 +3,10 @@
 namespace App\Action\Competition;
 
 use App\Action\EntrantRoundCount\GetEntrantRoundCountAction;
+use App\Action\PhoneBook\PhoneBookEntryExistsAction;
 use App\DTO\Competition\CompetitionPreCheckRequestDTO;
-use App\Enums\CompetitionStatusEnum;
 use App\Enums\ResponseStatus;
+use App\Exceptions\CallerExceededMaxEntriesHTTPException;
 use App\Exceptions\CompetitionClosedHTTPException;
 use App\Exceptions\NoActiveCompetitionButCompetitionNumberKnownHTTPException;
 use App\Exceptions\NoActiveCompetitionsHTTPException;
@@ -14,6 +15,8 @@ use App\Http\Resources\CompetitionCapacityCheckWithActivePhoneLineResource;
 use App\Http\Resources\CompetitionResource;
 use App\Models\ActiveCall;
 use App\Models\CompetitionPhoneLine;
+use App\Models\Participant;
+use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 class CompetitionPreCheckAction
@@ -23,75 +26,117 @@ class CompetitionPreCheckAction
      */
     public function handle(
         CompetitionPreCheckRequestDTO $requestDetails,
-        ?CompetitionPhoneLine         $phoneLine,
+        ?CompetitionPhoneLine          $phoneLine,
         string                        $responseType,
-                                      $recordActiveCall = true
+        $recordActiveCall = true
     ): CompetitionResource|CompetitionCapacityCheckResource|CompetitionCapacityCheckWithActivePhoneLineResource
     {
-        $activeCall = null;
-        $entriesCount = null;
         $callerNumber = $requestDetails->callerPhoneNumber;
+        $competitionPhoneNumberIsKnown = (new PhoneBookEntryExistsAction())->handle($requestDetails->competitionPhoneNumber);
 
         throw_if(
-            !$phoneLine,
+            !$phoneLine && !$competitionPhoneNumberIsKnown,
             new NoActiveCompetitionsHTTPException(
                 400,
-                'No competitions associated with this phone line.',
+                'No competitions associated with this phone line and number not recognised.',
                 [
                     'competition_id' => null,
                     'status' => ResponseStatus::REJECT_CALLER->value,
                     'active_call_id' => null,
+                    'sms_offer_enabled' => null
                 ])
         );
 
+        if ($recordActiveCall) {
+            $activeCall = ActiveCall::create([
+                'call_id' => $requestDetails->callID,
+                'phone_number' => $requestDetails->competitionPhoneNumber,
+                'caller_phone_number' => $callerNumber,
+            ]);
+        }
+
         throw_if(
-            $phoneLine->competition->isPreOpen,
+            !$phoneLine && $competitionPhoneNumberIsKnown,
             new NoActiveCompetitionButCompetitionNumberKnownHTTPException(
-                410,
-                'Competition is not yet open',
+                200,
+                'Competition is closed',
                 [
-                    'competition_id' => $phoneLine->competition->id,
-                    'status' => ResponseStatus::PRE_OPEN->value,
-                    'active_call_id' => null,
+                    'competition_id' => null,
+                    'status' => ResponseStatus::CLOSED->value,
+                    'active_call_id' => $recordActiveCall ? $activeCall->id : null,
+                    'sms_offer_enabled' => null
                 ])
         );
 
         $activePhoneLine = $phoneLine;
         $activeCompetition = $activePhoneLine->competition;
 
+        $currentRound = Cache::remember(
+            "competition_active_round__{$activePhoneLine->phone_number}__{$activePhoneLine->competition_id}",
+            now()->addSeconds(60),
+            fn() => (new GetCompetitionCurrentRoundAction())->handle($activePhoneLine->competition)
+        );
+
+        if ($recordActiveCall) {
+            $data = [];
+
+            if($currentRound){
+                $data['round_start'] = key($currentRound);
+                $data['round_end'] = current($currentRound);
+            }
+
+            $activeCall->update([
+                'competition_phone_line_id' => $activePhoneLine->id,
+                'competition_id' => $activePhoneLine->competition_id,
+                ...$data
+            ]);
+        }
+
+        if($currentRound) {
+            if ($recordActiveCall) {
+                //quicker method preferred by realtime check
+                $entriesCount = (new GetEntrantRoundCountAction())->handle($activeCall);
+            }else {
+                $entriesCount = Participant::where('telephone', $callerNumber)
+                    ->where('competition_id', $activePhoneLine->competition_id)
+                    ->whereBetween('created_at', [key($currentRound), current($currentRound)])
+                    ->count();
+            }
+
+            if ($entriesCount >= $activeCompetition->max_entries) {
+                throw_if(
+                    true,
+                    new CallerExceededMaxEntriesHTTPException(
+                        406,
+                        'Participant has exceeded allowed number of entries.',
+                        [
+                            'competition_id' => $activeCompetition->id,
+                            'active_phone_line' => $activePhoneLine,
+                            'status' => ResponseStatus::TOO_MANY->value,
+                            'active_call_id' => $recordActiveCall ? $activeCall->id : null,
+                            'sms_offer_enabled' => $activeCompetition->sms_offer_enabled,
+                        ])
+                );
+            }
+        }
+
         throw_if(
-            $activeCompetition->isClosed,
+            !$activeCompetition->isOpen,
             new CompetitionClosedHTTPException(
-                411,
+                200,
                 'Competition is closed',
                 [
                     'competition' => $activeCompetition,
                     'active_phone_line' => $activePhoneLine,
                     'status' => ResponseStatus::CLOSED->value,
-                    'active_call_id' => null,
+                    'active_call_id' => $recordActiveCall ? $activeCall->id : null,
+                    'sms_offer_enabled' =>$activeCompetition->sms_offer_enabled,
                 ])
         );
 
-        if ($recordActiveCall) {
-            $activeCall = ActiveCall::create([
-                'organisation_id' => $phoneLine->organisation_id,
-                'competition_id' => $phoneLine->competition->id,
-                'competition_phone_line_id' => $phoneLine->id,
-                'call_id' => $requestDetails->callID,
-                'phone_number' => $requestDetails->competitionPhoneNumber,
-                'caller_phone_number' => $callerNumber,
-                'cli_presentation' => $requestDetails->cliPresentation,
-                'status' => CompetitionStatusEnum::OPEN_PRE_ANSWER->value,
-            ]);
-        }
-
-        if ($recordActiveCall) {
-            $entriesCount = (new GetEntrantRoundCountAction())->handle($activeCall);
-        }
-
         return match ($responseType) {
-            CompetitionCapacityCheckResource::class => new CompetitionCapacityCheckResource($activeCompetition, ['status' => 'OPEN', 'active_call_id' => $activeCall?->id, 'entry_count' => $entriesCount]),
-            CompetitionCapacityCheckWithActivePhoneLineResource::class => new CompetitionCapacityCheckWithActivePhoneLineResource($activePhoneLine, ['status' => 'OPEN', 'active_call_id' => $activeCall?->id, 'entry_count' => $entriesCount]),
+            CompetitionCapacityCheckResource::class => new CompetitionCapacityCheckResource($activeCompetition, ['status' => 'OPEN', 'active_call_id' => $activeCall->id, 'sms_offer_enabled' => $activeCompetition->sms_offer_enabled]),
+            CompetitionCapacityCheckWithActivePhoneLineResource::class => new CompetitionCapacityCheckWithActivePhoneLineResource($activePhoneLine, ['status' => 'OPEN', 'active_call_id' => $activeCall->id, 'sms_offer_enabled' => $activeCompetition->sms_offer_enabled]),
             default => new CompetitionResource($activeCompetition),
         };
     }

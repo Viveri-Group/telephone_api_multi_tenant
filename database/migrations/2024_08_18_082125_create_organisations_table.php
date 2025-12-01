@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('organisations', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->integer('max_number_of_lines')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

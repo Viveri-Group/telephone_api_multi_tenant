@@ -22,8 +22,7 @@ class WebCompetitionResource extends JsonResource
 
             'type' => $this->type,
             'special_offer' => $this->special_offer,
-            'entries_warning' => $this->entries_warning,
-            'max_paid_entries' => $this->max_paid_entries,
+            'max_entries' => $this->max_entries,
             'created_at' => $this->created_at,
             'phone_lines' => WebPhoneLineResource::collection($this->phoneLines),
             'files' => WebFileUploadResource::collection($this->files),

@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('active_calls', function (Blueprint $table) {
-            $table->foreignId('organisation_id')->after('id')->constrained('organisations');
+            $table->foreignId('organisation_id')->nullable()->after('id')->constrained('organisations');
         });
     }
 

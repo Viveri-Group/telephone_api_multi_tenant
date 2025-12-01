@@ -43,6 +43,7 @@ class CallerHistoryTest extends TestCase
                         'uuid' => $participant->uuid,
                         'call_end' => $participant->call_end->format('Y-m-d H:i:s'),
                         'call_start' => $participant->call_start->format('Y-m-d H:i:s'),
+                        'organisation_id' => $participant->organisation_id,
                         'competition_id' => $participant->competition_id,
                         'call_id' => (int)$participant->call_id,
                         'created' => $participant->created_at->format('Y-m-d H:i:s'),
@@ -57,6 +58,7 @@ class CallerHistoryTest extends TestCase
                     ->where('failed_entries.0.id', $failedEntry->id)
                     ->where('failed_entries.0.type', 'failed-entry')
                     ->where('failed_entries.0.attributes', [
+                        'organisation_id' => $failedEntry->organisation_id,
                         'competition_id' => $failedEntry->competition_id,
                         'call_id' => (int)$failedEntry->call_id,
                         'competition_phone_number' => $failedEntry->phone_number,
@@ -72,9 +74,9 @@ class CallerHistoryTest extends TestCase
     {
         $this->login();
 
-        $compA = Competition::factory(['max_paid_entries' => 10])->create();
-        $compB = Competition::factory(['max_paid_entries' => 20])->create();
-        $compC = Competition::factory(['max_paid_entries' => 30])->create();
+        $compA = Competition::factory(['max_entries' => 10])->create();
+        $compB = Competition::factory(['max_entries' => 20])->create();
+        $compC = Competition::factory(['max_entries' => 30])->create();
 
         $participants = [
             'B1' => Participant::factory(['call_id'=>1001,'competition_id' => $compB->id, 'telephone' => '441604123123', 'call_start' => now(), 'call_end' => now()->addMinute(), 'audio_file_number' => 123,])->create(),
@@ -97,6 +99,7 @@ class CallerHistoryTest extends TestCase
                         'uuid' => $participants['A1']->uuid,
                         'call_end' => $participants['A1']->call_end->format('Y-m-d H:i:s'),
                         'call_start' => $participants['A1']->call_start->format('Y-m-d H:i:s'),
+                        'organisation_id' => $participants['A1']->organisation_id,
                         'competition_id' => $participants['A1']->competition_id,
                         'call_id' => $participants['A1']->call_id,
                         'created' => $participants['A1']->created_at->format('Y-m-d H:i:s'),
@@ -114,6 +117,7 @@ class CallerHistoryTest extends TestCase
                         'uuid' => $participants['A2']->uuid,
                         'call_end' => $participants['A2']->call_end->format('Y-m-d H:i:s'),
                         'call_start' => $participants['A2']->call_start->format('Y-m-d H:i:s'),
+                        'organisation_id' => $participants['A2']->organisation_id,
                         'competition_id' => $participants['A2']->competition_id,
                         'call_id' => $participants['A2']->call_id,
                         'created' => $participants['A2']->created_at->format('Y-m-d H:i:s'),
@@ -131,6 +135,7 @@ class CallerHistoryTest extends TestCase
                         'uuid' => $participants['A3']->uuid,
                         'call_end' => $participants['A3']->call_end->format('Y-m-d H:i:s'),
                         'call_start' => $participants['A3']->call_start->format('Y-m-d H:i:s'),
+                        'organisation_id' => $participants['A3']->organisation_id,
                         'competition_id' => $participants['A3']->competition_id,
                         'call_id' => $participants['A3']->call_id,
                         'created' => $participants['A3']->created_at->format('Y-m-d H:i:s'),
@@ -148,6 +153,7 @@ class CallerHistoryTest extends TestCase
                         'uuid' => $participants['B1']->uuid,
                         'call_end' => $participants['B1']->call_end->format('Y-m-d H:i:s'),
                         'call_start' => $participants['B1']->call_start->format('Y-m-d H:i:s'),
+                        'organisation_id' => $participants['B1']->organisation_id,
                         'competition_id' => $participants['B1']->competition_id,
                         'call_id' => $participants['B1']->call_id,
                         'created' => $participants['B1']->created_at->format('Y-m-d H:i:s'),
@@ -165,6 +171,7 @@ class CallerHistoryTest extends TestCase
                         'uuid' => $participants['B2']->uuid,
                         'call_end' => $participants['B2']->call_end->format('Y-m-d H:i:s'),
                         'call_start' => $participants['B2']->call_start->format('Y-m-d H:i:s'),
+                        'organisation_id' => $participants['B2']->organisation_id,
                         'competition_id' => $participants['B2']->competition_id,
                         'call_id' => $participants['B2']->call_id,
                         'created' => $participants['B2']->created_at->format('Y-m-d H:i:s'),
@@ -182,6 +189,7 @@ class CallerHistoryTest extends TestCase
                         'uuid' => $participants['C1']->uuid,
                         'call_end' => $participants['C1']->call_end->format('Y-m-d H:i:s'),
                         'call_start' => $participants['C1']->call_start->format('Y-m-d H:i:s'),
+                        'organisation_id' => $participants['C1']->organisation_id,
                         'competition_id' => $participants['C1']->competition_id,
                         'call_id' => $participants['C1']->call_id,
                         'created' => $participants['C1']->created_at->format('Y-m-d H:i:s'),

@@ -19,7 +19,6 @@ return new class extends Migration {
             $table->integer('size');
             $table->string('mime_type');
             $table->string('extension');
-            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -15,6 +15,7 @@ class GetOrganisationsAction
                     $org->id => [
                         'id' => $org->id,
                         'name' => $org->name,
+                        'max_number_of_lines' => $org->max_number_of_lines,
                     ]
                 ])
                 ->toArray();

@@ -2,10 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Action\Competition\CreateParticipantFromActiveCallDTOAction;
+use App\Action\Competition\CompetitionClearDownFailAction;
+use App\Action\Competition\CompetitionClearDownSuccessAction;
+use App\Action\EntrantRoundCount\GetEntrantRoundCountAction;
 use App\DTO\ActiveCall\ActiveCallDTO;
-use App\Models\ActiveCall;
-use App\Models\Participant;
+use App\Models\Competition;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -16,26 +17,26 @@ class HandleCompetitionClearDownSuccessJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public ActiveCallDTO $activeCallDTO)
+    public function __construct(public ActiveCallDTO $activeCallDTO, public bool $smsOfferAccepted)
     {
     }
 
     public function handle(): void
     {
-        if (is_null($this->activeCallDTO->participant_id)) {
-            (new CreateParticipantFromActiveCallDTOAction())->handle($this->activeCallDTO);
-        };
+        $entriesCount = (new GetEntrantRoundCountAction())->handle($this->activeCallDTO);
 
-        // updates paid AND free entries
-        Participant::where('call_id', $this->activeCallDTO->call_id)
-            ->update([
-                'call_end' => $this->activeCallDTO->call_end,
-                'audio_file_number' => $this->activeCallDTO->audioFileNumber ?: null,
-            ]);
+        $competition = Competition::find($this->activeCallDTO->competition_id);
 
-        ActiveCall::find($this->activeCallDTO->id)?->delete();
+        if ($entriesCount >= $competition->max_entries) {
+            (new CompetitionClearDownFailAction())->handle($this->activeCallDTO, 'TOO_MANY');
+        }else {
+            (new CompetitionClearDownSuccessAction())
+                ->handle(
+                    $this->activeCallDTO,
+                    $this->smsOfferAccepted
+                );
+        }
     }
-
 
     public function tags(): array
     {

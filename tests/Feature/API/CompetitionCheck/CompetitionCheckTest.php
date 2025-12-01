@@ -88,8 +88,6 @@ class CompetitionCheckTest extends TestCase
                     ->where('competition_id', null)
                     ->where('status', 'REJECT_CALLER')
                     ->where('total_entry_count', 0)
-                    ->where('entries_warning', 0)
-                    ->where('max_paid_entries', null)
                     ->where('special_offer', 'FALSE')
                     ->has('active_call_id');
             });
@@ -147,7 +145,7 @@ class CompetitionCheckTest extends TestCase
         $competition = Competition::factory([
             'start' => '2024-01-10 15:10:00',
             'end' => '2024-01-15 15:00:00',
-            'max_paid_entries' => 2,
+            'max_entries' => 2,
         ])
             ->hasPhoneLines(1,['phone_number' => '44333456555'])
             ->create();
@@ -166,8 +164,7 @@ class CompetitionCheckTest extends TestCase
                     ->has('active_call_id')
                     ->where('status', 'CLOSED')
                     ->where('total_entry_count', 0)
-                    ->where('entries_warning', 0)
-                    ->where('max_paid_entries', 2)
+                    ->where('max_entries', 2)
                     ->where('special_offer', 'FALSE');
             });
 
@@ -188,7 +185,7 @@ class CompetitionCheckTest extends TestCase
         $competition = Competition::factory([
             'start' => '2024-01-10 15:10:00',
             'end' => '2024-01-15 15:00:00',
-            'max_paid_entries' => 4,
+            'max_entries' => 4,
             'special_offer' => 'BOGOF',
         ])
             ->hasPhoneLines(1,['phone_number' => '44333456555'])
@@ -209,8 +206,7 @@ class CompetitionCheckTest extends TestCase
                     ->has('active_call_id')
                     ->where('status', 'OPEN')
                     ->where('total_entry_count', 0)
-                    ->where('entries_warning', 0)
-                    ->where('max_paid_entries', 4)
+                    ->where('max_entries', 4)
                     ->where('special_offer', 'BOGOF');
             });
 
@@ -242,8 +238,7 @@ class CompetitionCheckTest extends TestCase
         $competition = Competition::factory([
             'start' => '2024-01-10 15:10:00',
             'end' => '2024-01-15 15:00:00',
-            'entries_warning' => 4,
-            'max_paid_entries'=> 3
+            'max_entries'=> 3
         ])
             ->hasPhoneLines(1,['phone_number' => '44333456555'])
             ->create();
@@ -267,8 +262,7 @@ class CompetitionCheckTest extends TestCase
                     ->has('active_call_id')
                     ->where('status', 'OPEN')
                     ->where('total_entry_count', 15)
-                    ->where('entries_warning', 4)
-                    ->where('max_paid_entries', 3)
+                    ->where('max_entries', 3)
                     ->where('special_offer', 'FALSE');
             });
 
