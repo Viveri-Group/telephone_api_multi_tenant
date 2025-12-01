@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->string('round_hash')->unique();
             $table->string('drawn_by')->nullable();
 
-            $table->softDeletes();
             $table->timestamps();
         });
     }

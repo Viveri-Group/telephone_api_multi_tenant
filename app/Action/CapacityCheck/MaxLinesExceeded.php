@@ -2,18 +2,22 @@
 
 namespace App\Action\CapacityCheck;
 
+use App\Action\Organisation\GetOrganisationAction;
+
 class MaxLinesExceeded
 {
-    public function handle(int $currentActiveCalls): bool
+    public function handle(int $organisationId, int $currentActiveCalls): bool
     {
-        if(!config('system.ENFORCE_MAX_NUMBER_OF_LINES')) {
+        $org = (new GetOrganisationAction())->handle($organisationId);
+
+        if(!$org['max_number_of_lines']) {
             return false;
         }
 
-        if(config('system.MAX_NUMBER_OF_LINES') < 0){
+        if($org['max_number_of_lines'] < 0){
             return false;
         }
 
-        return $currentActiveCalls >= config('system.MAX_NUMBER_OF_LINES');
+        return $currentActiveCalls >= $org['max_number_of_lines'];
     }
 }

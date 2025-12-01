@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('participants', function (Blueprint $table) {
-            $table->index(['call_id', 'deleted_at']);
+            $table->index(['call_id']);
         });
 
         Schema::table('api_request_logs', function (Blueprint $table) {
@@ -20,7 +20,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('participants', function (Blueprint $table) {
-            $table->dropIndex(['call_id', 'deleted_at']);
+            $table->dropIndex(['call_id']);
         });
 
         Schema::table('api_request_logs', function (Blueprint $table) {

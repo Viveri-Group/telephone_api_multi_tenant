@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->string('special_offer')->nullable();
             $table->integer('max_entries')->default(-1)->comment('number of times a tel number can enter the competition');
 
-            $table->softDeletes();
             $table->timestamps();
         });
     }

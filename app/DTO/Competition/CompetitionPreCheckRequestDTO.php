@@ -8,7 +8,6 @@ class CompetitionPreCheckRequestDTO
         public string $callerPhoneNumber,
         public string $competitionPhoneNumber,
         public ?string $callID,
-        public ?int $cliPresentation,
     )
     {
     }

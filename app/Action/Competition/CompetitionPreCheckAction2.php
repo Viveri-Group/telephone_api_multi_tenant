@@ -16,10 +16,11 @@ use App\Http\Resources\CompetitionResource;
 use App\Models\ActiveCall;
 use App\Models\CompetitionPhoneLine;
 use App\Models\Participant;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Throwable;
 
-class CompetitionPreCheckAction
+class CompetitionPreCheckAction2
 {
     /**
      * @throws Throwable
@@ -28,7 +29,7 @@ class CompetitionPreCheckAction
         CompetitionPreCheckRequestDTO $requestDetails,
         ?CompetitionPhoneLine          $phoneLine,
         string                        $responseType,
-        $recordActiveCall = true
+                                      $recordActiveCall = true
     ): CompetitionResource|CompetitionCapacityCheckResource|CompetitionCapacityCheckWithActivePhoneLineResource
     {
         $callerNumber = $requestDetails->callerPhoneNumber;

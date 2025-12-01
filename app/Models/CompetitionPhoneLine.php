@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CompetitionPhoneLine extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory;
 
     public function organisation(): BelongsTo
     {

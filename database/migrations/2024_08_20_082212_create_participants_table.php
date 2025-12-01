@@ -22,7 +22,6 @@ return new class extends Migration {
             $table->string('round_end')->nullable();
             $table->dateTime('call_start')->index()->nullable()->comment('time the call originally came in');
             $table->dateTime('call_end')->nullable();
-            $table->softDeletes();
             $table->timestamps();
         });
     }
