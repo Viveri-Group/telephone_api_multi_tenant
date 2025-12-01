@@ -13,6 +13,7 @@ class OrganisationFactory extends Factory
     {
         return [
             'name' => $this->faker->company(),
+            'max_number_of_lines' => 50
         ];
     }
 }

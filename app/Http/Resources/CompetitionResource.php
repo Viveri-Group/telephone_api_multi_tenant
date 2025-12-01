@@ -24,7 +24,7 @@ class CompetitionResource extends JsonResource
 //                'active_to' => $this->type !== 'WHOLE_COMPETITION' ? $this->active_to : null,
 //                'day_of_week' => $this->type === 'WEEKLY' ? $this->day_of_week : null,
 
-                'type' => $this->type,
+//                'type' => $this->type,
                 'max_entries' => $this->max_entries,
 
                 'promo_code_id' => $this->promo_code_id,

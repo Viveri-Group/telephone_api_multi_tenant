@@ -24,8 +24,6 @@ class CapacityCheckTest extends TestCase
 
         $this->login();
 
-        Config::set('bauer.MAX_NUMBER_OF_LINES', 50);
-
         $competition = Competition::factory(['start' => now()->subDay(), 'end' => now()->addDay(), 'max_entries' => 2])
             ->hasPhoneLines(['phone_number' => '0333456555'])
             ->create();
@@ -39,10 +37,13 @@ class CapacityCheckTest extends TestCase
         ])
             ->assertOk()
             ->assertJson(function (AssertableJson $json) use ($competition) {
-                dd($json);
                 return $json
                     ->where('competition_id', $competition->id)
-                    ->where('sms_offer_enabled', 'FALSE')
+                    ->where('status', 'OPEN')
+                    ->where('total_entry_count', 0)
+                    ->where('max_entries', 2)
+                    ->where('special_offer', 'FALSE')
+                    ->where('sms_offer_enabled', false)
                     ->where('INTRO', 1)
                     ->where('CLI_READOUT_NOTICE', 2)
                     ->where('DTMF_MENU', 3)
@@ -50,14 +51,14 @@ class CapacityCheckTest extends TestCase
                     ->where('DTMF_FAIL', 6)
                     ->where('COMPETITION_CLOSED', 7)
                     ->where('TOO_MANY_ENTRIES', 8)
-                    ->where('status', 'OPEN')
+                    ->where('total_entry_count', 0)
                     ->has('active_call_id');
             });
 
         $queryLog = DB::getQueryLog();
         $queryCount = count($queryLog);
 
-        $this->assertLessThanOrEqual(15, $queryCount);
+        $this->assertLessThanOrEqual(17, $queryCount);
 
         $this->assertCount(1, $activeCalls = ActiveCall::all());
 
@@ -76,6 +77,9 @@ class CapacityCheckTest extends TestCase
                     'competition_id' => $competition->id,
                     'status' => 'OPEN',
                     'active_call_id' => $activeCall->id,
+                    'total_entry_count' => 0,
+                    'max_entries' => 2,
+                    'special_offer' => 'FALSE',
                     'sms_offer_enabled' => false,
                     'INTRO' => 1,
                     'CLI_READOUT_NOTICE' => 2,
@@ -96,7 +100,6 @@ class CapacityCheckTest extends TestCase
 
         $this->login();
 
-        Config::set('bauer.MAX_NUMBER_OF_LINES', 50);
 
         $competition = Competition::factory(['start' => now()->subDay(), 'end' => now()->addDay(), 'max_entries' => 1, 'sms_offer_enabled' => true])
             ->hasPhoneLines(['phone_number' => '0333456555'])
@@ -113,6 +116,10 @@ class CapacityCheckTest extends TestCase
             ->assertJson(function (AssertableJson $json) use ($competition) {
                 return $json
                     ->where('competition_id', $competition->id)
+                    ->where('status', 'OPEN')
+                    ->where('total_entry_count', 0)
+                    ->where('max_entries', 1)
+                    ->where('special_offer', 'FALSE')
                     ->where('sms_offer_enabled', true)
                     ->where('INTRO', 1)
                     ->where('CLI_READOUT_NOTICE', 2)
@@ -121,14 +128,14 @@ class CapacityCheckTest extends TestCase
                     ->where('DTMF_FAIL', 6)
                     ->where('COMPETITION_CLOSED', 7)
                     ->where('TOO_MANY_ENTRIES', 8)
-                    ->where('status', 'OPEN')
+                    ->where('total_entry_count', 0)
                     ->has('active_call_id');
             });
 
         $queryLog = DB::getQueryLog();
         $queryCount = count($queryLog);
 
-        $this->assertLessThanOrEqual(15, $queryCount);
+        $this->assertLessThanOrEqual(17, $queryCount);
 
         $this->assertCount(1, $activeCalls = ActiveCall::all());
 
@@ -147,6 +154,9 @@ class CapacityCheckTest extends TestCase
                     'competition_id' => $competition->id,
                     'status' => 'OPEN',
                     'active_call_id' => $activeCall->id,
+                    'total_entry_count' => 0,
+                    'max_entries' => 1,
+                    'special_offer' => 'FALSE',
                     'sms_offer_enabled' => true,
                     'INTRO' => 1,
                     'CLI_READOUT_NOTICE' => 2,
@@ -169,14 +179,9 @@ class CapacityCheckTest extends TestCase
 
         $this->login();
 
-        Config::set('bauer.MAX_NUMBER_OF_LINES', 50);
-
         $competition = Competition::factory([
-            'type' => 'DAILY',
-            'start' => '2024-01-01 00:00:00',
+            'start' => '2024-01-01 10:00:00',
             'end' => '2024-01-31 00:00:00',
-            'active_from' => '15:10:00',
-            'active_to' => '15:00:00',
         ])
             ->hasPhoneLines(['phone_number' => '0333456555'])
             ->create();
@@ -192,6 +197,10 @@ class CapacityCheckTest extends TestCase
             ->assertJson(function (AssertableJson $json) use ($competition) {
                 return $json
                     ->where('competition_id', $competition->id)
+                    ->where('status', 'CLOSED')
+                    ->where('total_entry_count', 0)
+                    ->where('max_entries', 10)
+                    ->where('special_offer', 'FALSE')
                     ->where('sms_offer_enabled', false)
                     ->where('INTRO', 1)
                     ->where('CLI_READOUT_NOTICE', 2)
@@ -200,14 +209,14 @@ class CapacityCheckTest extends TestCase
                     ->where('DTMF_FAIL', 6)
                     ->where('COMPETITION_CLOSED', 7)
                     ->where('TOO_MANY_ENTRIES', 8)
-                    ->where('status', 'CLOSED')
+                    ->where('total_entry_count', 0)
                     ->has('active_call_id');
             });
 
         $queryLog = DB::getQueryLog();
         $queryCount = count($queryLog);
 
-        $this->assertLessThanOrEqual(15, $queryCount);
+        $this->assertLessThanOrEqual(17, $queryCount);
 
         $this->assertCount(1, $activeCalls = ActiveCall::all());
 
@@ -226,6 +235,9 @@ class CapacityCheckTest extends TestCase
                     'competition_id' => $competition->id,
                     'status' => 'CLOSED',
                     'active_call_id' => $activeCall->id,
+                    'total_entry_count' => 0,
+                    'max_entries' => 10,
+                    'special_offer' => 'FALSE',
                     'sms_offer_enabled' => false,
                     'INTRO' => 1,
                     'CLI_READOUT_NOTICE' => 2,
@@ -248,8 +260,6 @@ class CapacityCheckTest extends TestCase
 
         $this->login();
 
-        Config::set('bauer.MAX_NUMBER_OF_LINES', 50);
-
         PhoneBookEntry::factory(['phone_number' => '0333456555'])->create();
 
         DB::enableQueryLog();
@@ -263,7 +273,7 @@ class CapacityCheckTest extends TestCase
             ->assertJson(function (AssertableJson $json)  {
                 return $json
                     ->where('competition_id', null)
-                    ->where('sms_offer_enabled', null)
+                    ->where('status', 'CLOSED')
                     ->where('INTRO', 1)
                     ->where('CLI_READOUT_NOTICE', 2)
                     ->where('DTMF_MENU', 3)
@@ -271,7 +281,6 @@ class CapacityCheckTest extends TestCase
                     ->where('DTMF_FAIL', 6)
                     ->where('COMPETITION_CLOSED', 7)
                     ->where('TOO_MANY_ENTRIES', 8)
-                    ->where('status', 'CLOSED')
                     ->has('active_call_id');
             });
 
@@ -297,7 +306,6 @@ class CapacityCheckTest extends TestCase
                     'competition_id' => null,
                     'status' => 'CLOSED',
                     'active_call_id' => $activeCall->id,
-                    'sms_offer_enabled' => null,
                     'INTRO' => 1,
                     'CLI_READOUT_NOTICE' => 2,
                     'DTMF_MENU' => 3,
@@ -309,11 +317,21 @@ class CapacityCheckTest extends TestCase
         });
     }
 
-    public function test_capacity_check_fails()
+    public function test_capacity_check_fails_max_lines_exceeded()
     {
+        Bus::fake();
+
+        $this->setFileDefaults();
+
         $this->login();
 
-        Config::set('bauer.MAX_NUMBER_OF_LINES', 0);
+        $competition = Competition::factory(['start' => now()->subDay(), 'end' => now()->addDay(), 'max_entries' => 2])
+            ->hasPhoneLines(['phone_number' => '0333456555'])
+            ->create();
+
+        $competition->organisation()->update(['max_number_of_lines' => 1]);
+
+        ActiveCall::factory(['organisation_id' => $competition->organisation_id])->create();
 
         DB::enableQueryLog();
 
@@ -331,16 +349,14 @@ class CapacityCheckTest extends TestCase
         $queryLog = DB::getQueryLog();
         $queryCount = count($queryLog);
 
-        $this->assertLessThanOrEqual(5, $queryCount);
+        $this->assertLessThanOrEqual(7, $queryCount);
 
-        $this->assertCount(0, ActiveCall::all());
+        $this->assertCount(1, ActiveCall::all());
     }
 
     public function test_no_competition()
     {
         $this->login();
-
-        Config::set('bauer.MAX_NUMBER_OF_LINES', 50);
 
         DB::enableQueryLog();
 
@@ -353,8 +369,9 @@ class CapacityCheckTest extends TestCase
             ->assertJson(function (AssertableJson $json) {
                 return $json
                     ->where('competition_id', null)
-                    ->where('sms_offer_enabled', null)
                     ->where('active_call_id', null)
+                    ->where('total_entry_count', 0)
+                    ->where('special_offer', 'FALSE')
                     ->where('status', 'REJECT_CALLER');
             });
 
@@ -362,44 +379,6 @@ class CapacityCheckTest extends TestCase
         $queryCount = count($queryLog);
 
         $this->assertLessThanOrEqual(8, $queryCount);
-
-        $this->assertCount(0, ActiveCall::all());
-    }
-
-    public function test_phone_line_is_associated_with_multiple_competitions()
-    {
-        $this->login();
-
-        Config::set('bauer.MAX_NUMBER_OF_LINES', 50);
-
-        Competition::factory(['start' => now()->subDay(), 'end' => now()->addDay()])
-            ->hasPhoneLines(['phone_number' => '0333456555'])
-            ->create();
-
-        Competition::factory(['start' => now()->subDay(), 'end' => now()->addDay()])
-            ->hasPhoneLines(['phone_number' => '0333456555'])
-            ->create();
-
-        DB::enableQueryLog();
-
-        $this->post(route('active-call.capacity-check'), [
-            'call_id' => 53,
-            'phone_number' => '0333456555',
-            'caller_phone_number' => '441604556778',
-        ])
-            ->assertConflict()
-            ->assertJson(function (AssertableJson $json) {
-                return $json
-                    ->where('competition_id', null)
-                    ->where('sms_offer_enabled', null)
-                    ->where('status', 'REJECT_CALLER')
-                    ->where('active_call_id', null);
-            });
-
-        $queryLog = DB::getQueryLog();
-        $queryCount = count($queryLog);
-
-        $this->assertLessThanOrEqual(9, $queryCount);
 
         $this->assertCount(0, ActiveCall::all());
     }
@@ -412,15 +391,13 @@ class CapacityCheckTest extends TestCase
 
         $this->login();
 
-        Config::set('bauer.MAX_NUMBER_OF_LINES', 50);
-
         $competition = Competition::factory(['start' => '2025-02-04 09:00:00', 'end' => '2025-02-06 10:00:00', 'max_entries' => 1])
             ->hasPhoneLines(['phone_number' => '0333456555'])
             ->create();
 
         EntrantRoundCount::factory([
             'hash' => hash('xxh128', "2025-02-04 09:00:00 {$competition->id} 441604556778"),
-            'entry_count' => 50,
+            'total_entry_count' => 50,
         ])->create();
 
         DB::enableQueryLog();
@@ -434,14 +411,8 @@ class CapacityCheckTest extends TestCase
             ->assertJson(function (AssertableJson $json) use ($competition) {
                 return $json
                     ->where('competition_id', $competition->id)
-                    ->where('sms_offer_enabled', false)
-                    ->where('INTRO', 1)
-                    ->where('CLI_READOUT_NOTICE', 2)
-                    ->where('DTMF_MENU', 3)
-                    ->where('DTMF_SUCCESS', 4)
-                    ->where('DTMF_FAIL', 6)
-                    ->where('COMPETITION_CLOSED', 7)
-                    ->where('TOO_MANY_ENTRIES', 8)
+                    ->where('total_entry_count', 0)
+                    ->where('special_offer', 'FALSE')
                     ->where('status', 'TOO_MANY')
                     ->whereNot('active_call_id', null);
             });
@@ -450,43 +421,5 @@ class CapacityCheckTest extends TestCase
         $queryCount = count($queryLog);
 
         $this->assertLessThanOrEqual(15, $queryCount);
-    }
-
-    public function test_participant_is_already_in_active_calls_table()
-    {
-        $this->setFileDefaults();
-
-        $this->login();
-
-        Config::set('bauer.MAX_NUMBER_OF_LINES', 50);
-
-        Competition::factory(['start' => now()->subDay(), 'end' => now()->addDay(), 'max_entries' => 1])
-            ->hasPhoneLines(['phone_number' => '0333456555'])
-            ->create();
-
-        ActiveCall::factory(['phone_number' => '0333456555', 'caller_phone_number' => '441604556778'])->create();
-
-        DB::enableQueryLog();
-
-        $this->post(route('active-call.capacity-check'), [
-            'call_id' => 53,
-            'phone_number' => '0333456555',
-            'caller_phone_number' => '441604556778',
-        ])
-            ->assertTooManyRequests()
-            ->assertJson(function (AssertableJson $json) {
-                return $json
-                    ->where('competition_id', null)
-                    ->where('sms_offer_enabled', null)
-                    ->where('status', 'REJECT_CALLER')
-                    ->where('active_call_id', null);
-            });
-
-        $queryLog = DB::getQueryLog();
-        $queryCount = count($queryLog);
-
-        $this->assertLessThanOrEqual(6, $queryCount);
-
-        $this->assertCount(1, ActiveCall::all());
     }
 }

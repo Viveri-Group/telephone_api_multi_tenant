@@ -16,16 +16,14 @@ class GetCompetitionAudioTest extends TestCase
     {
         parent::setUp();
 
-        FileDefault::factory()->create(['external_id' => 1, 'type' => CompetitionAudioType::PRE_EVENT]);
-        FileDefault::factory()->create(['external_id' => 2, 'type' => CompetitionAudioType::POST_EVENT]);
-        FileDefault::factory()->create(['external_id' => 3, 'type' => CompetitionAudioType::FN1]);
-        FileDefault::factory()->create(['external_id' => 4, 'type' => CompetitionAudioType::FN2]);
-        FileDefault::factory()->create(['external_id' => 5, 'type' => CompetitionAudioType::FN3]);
-        FileDefault::factory()->create(['external_id' => 6, 'type' => CompetitionAudioType::FN4]);
-        FileDefault::factory()->create(['external_id' => 7, 'type' => CompetitionAudioType::FN5]);
-        FileDefault::factory()->create(['external_id' => 8, 'type' => CompetitionAudioType::FN6]);
-        FileDefault::factory()->create(['external_id' => 9, 'type' => CompetitionAudioType::CALL_COST_WARNING]);
-        FileDefault::factory()->create(['external_id' => 10, 'type' => CompetitionAudioType::CAPPING_MESSAGE]);
+        FileDefault::factory()->create(['external_id' => 1, 'type' => CompetitionAudioType::INTRO->name]);
+        FileDefault::factory()->create(['external_id' => 2, 'type' => CompetitionAudioType::CLI_READOUT_NOTICE->name]);
+        FileDefault::factory()->create(['external_id' => 3, 'type' => CompetitionAudioType::DTMF_MENU->name]);
+        FileDefault::factory()->create(['external_id' => 4, 'type' => CompetitionAudioType::DTMF_SUCCESS->name]);
+        FileDefault::factory()->create(['external_id' => 5, 'type' => CompetitionAudioType::DTMF_SUCCESS_SMS->name]);
+        FileDefault::factory()->create(['external_id' => 6, 'type' => CompetitionAudioType::DTMF_FAIL->name]);
+        FileDefault::factory()->create(['external_id' => 7, 'type' => CompetitionAudioType::COMPETITION_CLOSED->name]);
+        FileDefault::factory()->create(['external_id' => 8, 'type' => CompetitionAudioType::TOO_MANY_ENTRIES->name]);
 
         $this->competition = Competition::factory()
             ->hasPhoneLines(['phone_number' => '0333111111'])
@@ -38,30 +36,27 @@ class GetCompetitionAudioTest extends TestCase
             'external_id' => 999,
             'competition_id' => null,
             'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
-            'type' => CompetitionAudioType::PRE_EVENT->name,
+            'type' => CompetitionAudioType::INTRO->name,
         ]);
 
         FileUpload::factory()->create([
             'external_id' => 2000,
             'competition_id' => null,
             'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
-            'type' => CompetitionAudioType::POST_EVENT->name,
+            'type' => CompetitionAudioType::DTMF_FAIL->name,
         ]);
 
         $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->competition->phoneLines()->first());
 
         $this->assertEqualsCanonicalizing(
             [
-                "PRE_EVENT" => 999,
-                "POST_EVENT" => 2000,
-                "FN1" => 3,
-                "FN2" => 4,
-                "FN3" => 5,
-                "FN4" => 6,
-                "FN5" => 7,
-                "FN6" => 8,
-                "CALL_COST_WARNING" => 9,
-                "CAPPING_MESSAGE" => 10,
+                "INTRO" => 999,
+                "CLI_READOUT_NOTICE" => 2,
+                "DTMF_MENU" => 3,
+                "DTMF_SUCCESS" => 4,
+                "DTMF_FAIL" => 2000,
+                "COMPETITION_CLOSED" => 7,
+                "TOO_MANY_ENTRIES" => 8,
             ], $audioFiles);
     }
 
@@ -71,30 +66,27 @@ class GetCompetitionAudioTest extends TestCase
             'external_id' => 500,
             'competition_id' => $this->competition->id,
             'competition_phone_line_id' => null,
-            'type' => CompetitionAudioType::PRE_EVENT->name,
+            'type' => CompetitionAudioType::INTRO->name,
         ]);
 
         FileUpload::factory()->create([
             'external_id' => 600,
             'competition_id' => $this->competition->id,
             'competition_phone_line_id' => null,
-            'type' => CompetitionAudioType::POST_EVENT->name,
+            'type' => CompetitionAudioType::DTMF_FAIL->name,
         ]);
 
         $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->competition->phoneLines()->first());
 
         $this->assertEqualsCanonicalizing(
             [
-                "PRE_EVENT" => 500,
-                "POST_EVENT" => 600,
-                "FN1" => 3,
-                "FN2" => 4,
-                "FN3" => 5,
-                "FN4" => 6,
-                "FN5" => 7,
-                "FN6" => 8,
-                "CALL_COST_WARNING" => 9,
-                "CAPPING_MESSAGE" => 10,
+                "INTRO" => 500,
+                "CLI_READOUT_NOTICE" => 2,
+                "DTMF_MENU" => 3,
+                "DTMF_SUCCESS" => 4,
+                "DTMF_FAIL" => 600,
+                "COMPETITION_CLOSED" => 7,
+                "TOO_MANY_ENTRIES" => 8,
             ], $audioFiles);
     }
 
@@ -104,16 +96,13 @@ class GetCompetitionAudioTest extends TestCase
 
         $this->assertEqualsCanonicalizing(
             [
-                "PRE_EVENT" => 1,
-                "POST_EVENT" => 2,
-                "FN1" => 3,
-                "FN2" => 4,
-                "FN3" => 5,
-                "FN4" => 6,
-                "FN5" => 7,
-                "FN6" => 8,
-                "CALL_COST_WARNING" => 9,
-                "CAPPING_MESSAGE" => 10,
+                "INTRO" => 1,
+                "CLI_READOUT_NOTICE" => 2,
+                "DTMF_MENU" => 3,
+                "DTMF_SUCCESS" => 4,
+                "DTMF_FAIL" => 6,
+                "COMPETITION_CLOSED" => 7,
+                "TOO_MANY_ENTRIES" => 8,
             ], $audioFiles);
     }
 
@@ -123,37 +112,34 @@ class GetCompetitionAudioTest extends TestCase
             'external_id' => 100,
             'competition_id' => $this->competition->id,
             'competition_phone_line_id' => null,
-            'type' => CompetitionAudioType::POST_EVENT->name,
+            'type' => CompetitionAudioType::DTMF_FAIL->name,
         ]);
 
         FileUpload::factory()->create([
             'external_id' => 600,
             'competition_id' => $this->competition->id,
             'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
-            'type' => CompetitionAudioType::POST_EVENT->name,
+            'type' => CompetitionAudioType::DTMF_FAIL->name,
         ]);
 
         FileUpload::factory()->create([
             'external_id' => 500,
             'competition_id' => $this->competition->id,
             'competition_phone_line_id' => null,
-            'type' => CompetitionAudioType::PRE_EVENT->name,
+            'type' => CompetitionAudioType::INTRO->name,
         ]);
 
         $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->competition->phoneLines()->first());
 
         $this->assertEqualsCanonicalizing(
             [
-                "PRE_EVENT" => 500,
-                "POST_EVENT" => 600,
-                "FN1" => 3,
-                "FN2" => 4,
-                "FN3" => 5,
-                "FN4" => 6,
-                "FN5" => 7,
-                "FN6" => 8,
-                "CALL_COST_WARNING" => 9,
-                "CAPPING_MESSAGE" => 10,
+                "INTRO" => 500,
+                "CLI_READOUT_NOTICE" => 2,
+                "DTMF_MENU" => 3,
+                "DTMF_SUCCESS" => 4,
+                "DTMF_FAIL" => 600,
+                "COMPETITION_CLOSED" => 7,
+                "TOO_MANY_ENTRIES" => 8,
             ], $audioFiles);
     }
 
@@ -170,14 +156,14 @@ class GetCompetitionAudioTest extends TestCase
             'external_id' => 999,
             'competition_id' => null,
             'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
-            'type' => CompetitionAudioType::PRE_EVENT->name,
+            'type' => CompetitionAudioType::INTRO->name,
         ]);
 
         FileUpload::factory()->create([
             'external_id' => 888,
             'competition_id' => null,
             'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
-            'type' => CompetitionAudioType::FN1->name,
+            'type' => CompetitionAudioType::COMPETITION_CLOSED->name,
         ]);
 
         $audioFilesPhoneLineA = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($phoneLines->get(0));
@@ -185,32 +171,26 @@ class GetCompetitionAudioTest extends TestCase
 
         $this->assertEqualsCanonicalizing(
             [
-                "PRE_EVENT" => 999,
-                "POST_EVENT" => 2,
-                "FN1" => 888,
-                "FN2" => 4,
-                "FN3" => 5,
-                "FN4" => 6,
-                "FN5" => 7,
-                "FN6" => 8,
-                "CALL_COST_WARNING" => 9,
-                "CAPPING_MESSAGE" => 10,
+                "INTRO" => 999,
+                "CLI_READOUT_NOTICE" => 2,
+                "DTMF_MENU" => 3,
+                "DTMF_SUCCESS" => 4,
+                "DTMF_FAIL" => 6,
+                "COMPETITION_CLOSED" => 888,
+                "TOO_MANY_ENTRIES" => 8,
             ],
             $audioFilesPhoneLineA
         );
 
         $this->assertEqualsCanonicalizing(
             [
-                "PRE_EVENT" => 1,
-                "POST_EVENT" => 2,
-                "FN1" => 3,
-                "FN2" => 4,
-                "FN3" => 5,
-                "FN4" => 6,
-                "FN5" => 7,
-                "FN6" => 8,
-                "CALL_COST_WARNING" => 9,
-                "CAPPING_MESSAGE" => 10,
+                "INTRO" => 1,
+                "CLI_READOUT_NOTICE" => 2,
+                "DTMF_MENU" => 3,
+                "DTMF_SUCCESS" => 4,
+                "DTMF_FAIL" => 6,
+                "COMPETITION_CLOSED" => 7,
+                "TOO_MANY_ENTRIES" => 8,
             ],
             $audioFilesPhoneLineB
         );
@@ -229,14 +209,14 @@ class GetCompetitionAudioTest extends TestCase
             'external_id' => 999,
             'competition_id' => $this->competition->id,
             'competition_phone_line_id' => null,
-            'type' => CompetitionAudioType::PRE_EVENT->name,
+            'type' => CompetitionAudioType::INTRO->name,
         ]);
 
         FileUpload::factory()->create([
             'external_id' => 888,
             'competition_id' => null,
             'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
-            'type' => CompetitionAudioType::FN2->name,
+            'type' => CompetitionAudioType::COMPETITION_CLOSED->name,
         ]);
 
         $audioFilesPhoneLineA = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($phoneLines->get(0));
@@ -244,32 +224,26 @@ class GetCompetitionAudioTest extends TestCase
 
         $this->assertEqualsCanonicalizing(
             [
-                "PRE_EVENT" => 999,
-                "POST_EVENT" => 2,
-                "FN1" => 3,
-                "FN2" => 888,
-                "FN3" => 5,
-                "FN4" => 6,
-                "FN5" => 7,
-                "FN6" => 8,
-                "CALL_COST_WARNING" => 9,
-                "CAPPING_MESSAGE" => 10,
+                "INTRO" => 999,
+                "CLI_READOUT_NOTICE" => 2,
+                "DTMF_MENU" => 3,
+                "DTMF_SUCCESS" => 4,
+                "DTMF_FAIL" => 6,
+                "COMPETITION_CLOSED" => 888,
+                "TOO_MANY_ENTRIES" => 8,
             ],
             $audioFilesPhoneLineA
         );
 
         $this->assertEqualsCanonicalizing(
             [
-                "PRE_EVENT" => 999,
-                "POST_EVENT" => 2,
-                "FN1" => 3,
-                "FN2" => 4,
-                "FN3" => 5,
-                "FN4" => 6,
-                "FN5" => 7,
-                "FN6" => 8,
-                "CALL_COST_WARNING" => 9,
-                "CAPPING_MESSAGE" => 10,
+                "INTRO" => 999,
+                "CLI_READOUT_NOTICE" => 2,
+                "DTMF_MENU" => 3,
+                "DTMF_SUCCESS" => 4,
+                "DTMF_FAIL" => 6,
+                "COMPETITION_CLOSED" => 7,
+                "TOO_MANY_ENTRIES" => 8,
             ],
             $audioFilesPhoneLineB
         );

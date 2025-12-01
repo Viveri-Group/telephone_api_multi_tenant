@@ -41,7 +41,7 @@ class CapacityCheckController extends Controller
             }
         );
 
-        abort_if($this->maxNumberOfLinesExceeded($request, $phoneLine->competition), 412, 'Active lines allowance exceeded.');
+        abort_if($phoneLine?->competition && $this->maxNumberOfLinesExceeded($request, $phoneLine->competition), 412, 'Active lines allowance exceeded.');
 
         try {
             $response = (new CompetitionPreCheckAction())->handle(

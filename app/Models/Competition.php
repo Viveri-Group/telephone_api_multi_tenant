@@ -18,6 +18,8 @@ class Competition extends Model
         return [
             'start' => 'datetime',
             'end' => 'datetime',
+            'sms_offer_enabled' => 'boolean',
+            'sms_first_entry_enabled' => 'boolean',
         ];
     }
 

@@ -13,7 +13,7 @@ class GetEntrantRoundCountAction
         $entrant = EntrantRoundCount::where('hash', hash('xxh128', "{$activeCall->round_start} {$activeCall->competition_id} {$activeCall->caller_phone_number}"))->first();
 
         if($entrant){
-            return $entrant->entry_count;
+            return $entrant->total_entry_count;
         }
 
         return 0;

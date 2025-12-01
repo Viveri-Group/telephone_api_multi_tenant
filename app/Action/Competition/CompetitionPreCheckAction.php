@@ -120,6 +120,8 @@ class CompetitionPreCheckAction
             }
         }
 
+        $activeCompetition->isOpen;
+
         throw_if(
             !$activeCompetition->isOpen,
             new CompetitionClosedHTTPException(
@@ -136,7 +138,7 @@ class CompetitionPreCheckAction
 
         return match ($responseType) {
             CompetitionCapacityCheckResource::class => new CompetitionCapacityCheckResource($activeCompetition, ['status' => 'OPEN', 'active_call_id' => $activeCall->id, 'sms_offer_enabled' => $activeCompetition->sms_offer_enabled]),
-            CompetitionCapacityCheckWithActivePhoneLineResource::class => new CompetitionCapacityCheckWithActivePhoneLineResource($activePhoneLine, ['status' => 'OPEN', 'active_call_id' => $activeCall->id, 'sms_offer_enabled' => $activeCompetition->sms_offer_enabled]),
+            CompetitionCapacityCheckWithActivePhoneLineResource::class => new CompetitionCapacityCheckWithActivePhoneLineResource($activePhoneLine, ['status' => 'OPEN', 'active_call_id' => $activeCall->id, 'sms_offer_enabled' => $activeCompetition->sms_offer_enabled, 'entry_count'=>$entriesCount]),
             default => new CompetitionResource($activeCompetition),
         };
     }
