@@ -13,6 +13,7 @@ class FailedEntryResource extends JsonResource
             'type' => 'failed-entry',
             'id' => $this->id,
             'attributes' => [
+                'organisation_id' => $this->organisation_id,
                 'competition_id' => $this->competition_id,
                 'call_id' => $this->call_id,
                 'competition_phone_number' => $this->phone_number,

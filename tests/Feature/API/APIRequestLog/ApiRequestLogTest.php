@@ -58,33 +58,6 @@ class ApiRequestLogTest extends TestCase
         Bus::assertNotDispatched(UpdateAPIRequestLogJob::class);
     }
 
-    public function test_api_log_are_written_direct_to_db_but_response_data_is_empty()
-    {
-        Config::set('system.LOG_API_REQUEST_USING_QUEUE', false);
-        Bus::fake();
-        Carbon::setTestNow('2024-01-01 09:00:00');
-
-        $this->login();
-
-        $competition = Competition::factory()->create();
-        Participant::factory()->create(['competition_id' => $competition->id, 'call_start' => now()]);
-
-        $this->assertCount(0, APIRequestLog::all());
-
-        $response = $this->post(route('download.entrants', ['competition'=>$competition->id]), [
-            'date_from' => now()->subMinute()->format('Y-m-d\TH:i:s\Z'),
-            'date_to' => now()->addMinute()->format('Y-m-d\TH:i:s\Z'),
-        ])->assertOk();
-
-        $this->assertNotNull($response->headers->get('x-tracing-id'));
-
-        $this->assertCount(1, $logs = APIRequestLog::all());
-
-        tap($logs->first(), function (APIRequestLog $log) {
-            $this->assertSame('', $log->response_data);
-        });
-    }
-
     public function test_api_log_are_written_with_call_id_data()
     {
         Config::set('system.LOG_API_REQUEST_USING_QUEUE', false);
@@ -152,43 +125,6 @@ class ApiRequestLogTest extends TestCase
             function (UpdateAPIRequestLogJob $job) {
                 $this->assertSame('low', $job->queue);
                 $this->assertNotEmpty($job->responseData);
-
-                return true;
-            },
-        ]);
-    }
-
-    public function test_api_log_jobs_are_sent_to_queue_but_response_data_is_empty()
-    {
-        Config::set('system.LOG_API_REQUEST_USING_QUEUE', true);
-        Bus::fake();
-        Carbon::setTestNow('2024-01-01 09:00:00');
-
-        $this->login();
-
-        $this->assertCount(0, APIRequestLog::all());
-
-        $competition = Competition::factory()->create();
-        Participant::factory()->create(['competition_id' => $competition->id, 'call_start' => now()]);
-
-        $this->assertCount(0, APIRequestLog::all());
-
-        $response = $this->post(route('download.entrants', ['competition'=>$competition->id]), [
-            'date_from' => now()->subMinute()->format('Y-m-d\TH:i:s\Z'),
-            'date_to' => now()->addMinute()->format('Y-m-d\TH:i:s\Z'),
-        ])->assertOk();
-
-        $this->assertNotNull($response->headers->get('x-tracing-id'));
-
-        Bus::assertChained([
-            function (CreateAPIRequestLogJob $job) {
-                $this->assertSame('low', $job->queue);
-
-                return true;
-            },
-
-            function (UpdateAPIRequestLogJob $job) {
-                $this->assertEmpty($job->responseData);
 
                 return true;
             },

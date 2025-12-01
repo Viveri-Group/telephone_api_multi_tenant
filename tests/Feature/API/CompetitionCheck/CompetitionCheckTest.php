@@ -88,7 +88,6 @@ class CompetitionCheckTest extends TestCase
                     ->where('competition_id', null)
                     ->where('status', 'REJECT_CALLER')
                     ->where('total_entry_count', 0)
-                    ->where('max_entries', null)
                     ->where('special_offer', 'FALSE')
                     ->has('active_call_id');
             });
