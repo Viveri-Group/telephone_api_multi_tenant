@@ -211,6 +211,7 @@ Resources:
           PortMappings:
             - ContainerPort: 3306
               Protocol: tcp
+              Name: mysql
           Secrets:
             - Name: MYSQL_ROOT_PASSWORD
               ValueFrom: 'arn:aws:secretsmanager:eu-west-2:756455520547:secret:viveri/telephone-api-multi-tenant-rhGYDP:MYSQL_ROOT_PASSWORD::'
@@ -269,6 +270,7 @@ Resources:
           PortMappings:
             - ContainerPort: 6379
               Protocol: tcp
+              Name: redis
           MountPoints:
             - SourceVolume: redis-data
               ContainerPath: /data
@@ -671,35 +673,11 @@ Resources:
             Port: 443
             StatusCode: HTTP_301
 
-  ServiceDiscoveryNamespace:
-    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+  ServiceConnectNamespace:
+    Type: AWS::ServiceDiscovery::HttpNamespace
     Properties:
-      Name: !Sub 'multi-tenant-${Environment}.local'
-      Vpc: !Ref VpcId
-
-  MySQLServiceDiscovery:
-    Type: AWS::ServiceDiscovery::Service
-    Properties:
-      Name: mysql
-      DnsConfig:
-        DnsRecords:
-          - Type: A
-            TTL: 60
-        NamespaceId: !Ref ServiceDiscoveryNamespace
-      HealthCheckCustomConfig:
-        FailureThreshold: 1
-
-  RedisServiceDiscovery:
-    Type: AWS::ServiceDiscovery::Service
-    Properties:
-      Name: redis
-      DnsConfig:
-        DnsRecords:
-          - Type: A
-            TTL: 60
-        NamespaceId: !Ref ServiceDiscoveryNamespace
-      HealthCheckCustomConfig:
-        FailureThreshold: 1
+      Name: !Sub 'multi-tenant-${Environment}'
+      Description: Service Connect namespace for multi-tenant services
 
   MySQLECSService:
     Type: AWS::ECS::Service
@@ -725,8 +703,15 @@ Resources:
           Subnets: !Ref SubnetIds
           SecurityGroups: !Ref ECSSecurityGroupIds
       ServiceName: !Sub 'multi-tenant-mysql-service-${Environment}'
-      ServiceRegistries:
-        - RegistryArn: !GetAtt MySQLServiceDiscovery.Arn
+      ServiceConnectConfiguration:
+        Enabled: true
+        Namespace: !GetAtt ServiceConnectNamespace.Arn
+        Services:
+          - PortName: mysql
+            DiscoveryName: mysql
+            ClientAliases:
+              - Port: 3306
+                DnsName: !Sub 'mysql.multi-tenant-${Environment}.local'
       Tags:
         - Key: Environment
           Value: !Ref Environment
@@ -757,8 +742,15 @@ Resources:
           Subnets: !Ref SubnetIds
           SecurityGroups: !Ref ECSSecurityGroupIds
       ServiceName: !Sub 'multi-tenant-redis-service-${Environment}'
-      ServiceRegistries:
-        - RegistryArn: !GetAtt RedisServiceDiscovery.Arn
+      ServiceConnectConfiguration:
+        Enabled: true
+        Namespace: !GetAtt ServiceConnectNamespace.Arn
+        Services:
+          - PortName: redis
+            DiscoveryName: redis
+            ClientAliases:
+              - Port: 6379
+                DnsName: !Sub 'redis.multi-tenant-${Environment}.local'
       Tags:
         - Key: Environment
           Value: !Ref Environment
@@ -789,6 +781,9 @@ Resources:
           AssignPublicIp: ENABLED
           Subnets: !Ref SubnetIds
           SecurityGroups: !Ref ECSSecurityGroupIds
+      ServiceConnectConfiguration:
+        Enabled: true
+        Namespace: !GetAtt ServiceConnectNamespace.Arn
       ServiceName: !Sub 'multi-tenant-app-service-${Environment}'
       LoadBalancers:
         - TargetGroupArn: !Ref ALBTargetGroup
@@ -863,6 +858,9 @@ Resources:
           AssignPublicIp: ENABLED
           Subnets: !Ref SubnetIds
           SecurityGroups: !Ref ECSSecurityGroupIds
+      ServiceConnectConfiguration:
+        Enabled: true
+        Namespace: !GetAtt ServiceConnectNamespace.Arn
       ServiceName: !Sub 'multi-tenant-worker-service-${Environment}'
       Tags:
         - Key: Environment
