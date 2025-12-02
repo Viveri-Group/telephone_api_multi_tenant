@@ -20,7 +20,7 @@ class GetCompetitionDefaultAudioAction
     protected function getDefaultAudio(): Collection
     {
         return Cache::remember(
-            'system_default_audio_files__' . collect($this->expectedFileTypes)->implode('__'),
+            'bauer_default_audio_files__' . collect($this->expectedFileTypes)->implode('__'),
             now()->addMinute(),
             fn() => FileDefault::whereIn('type', $this->expectedFileTypes)->get()
         );

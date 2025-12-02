@@ -20,7 +20,7 @@ class WebCompetitionResource extends JsonResource
             'start' => $this->start->toIso8601String(),
             'end' => $this->end->toIso8601String(),
 
-            'type' => $this->type,
+//            'type' => $this->type,
             'special_offer' => $this->special_offer,
             'max_entries' => $this->max_entries,
             'created_at' => $this->created_at,

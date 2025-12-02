@@ -128,44 +128,6 @@ class CompetitionTest extends TestCase
                     ->where('data.attributes.is_open', false)
                     ->where('data.attributes.start', '2024-01-01T09:01:00+00:00')
                     ->where('data.attributes.end', '2024-01-02T09:00:00+00:00')
-                    ->where('data.attributes.special_offer', null)
-                    ->has('data.relationships.phone_lines', 0);
-            });
-
-        $this->assertCount(1, $competitions = Competition::all());
-
-        tap($competitions->first(), function (Competition $competition) use($start, $end) {
-           $this->assertSame('Test Competition', $competition->name);
-           $this->assertSame('2024-01-01T09:01:00+00:00', $competition->start->toIso8601String());
-           $this->assertSame('2024-01-02T09:00:00+00:00', $competition->end->toIso8601String());
-        });
-    }
-
-    public function test_can_create_competition_with_special_offer()
-    {
-        $start = now()->addMinute();
-        $end = now()->addDay();
-
-        $this->assertCount(0, Competition::all());
-
-        $this->post(route('competition.create'), [
-            'organisation_id' => $this->organisation->id,
-            'name' => 'Test Competition',
-            'start' => $start,
-            'end' => $end,
-            'max_entries' => 5,
-            'special_offer' => 'BOGOF'
-        ])
-            ->assertCreated()
-            ->assertJson(function (AssertableJson $json) use($start, $end) {
-                return $json
-                    ->where('data.type', 'competition')
-                    ->has('data.id')
-                    ->where('data.attributes.name', 'Test Competition')
-                    ->where('data.attributes.is_open', false)
-                    ->where('data.attributes.start', '2024-01-01T09:01:00+00:00')
-                    ->where('data.attributes.end', '2024-01-02T09:00:00+00:00')
-                    ->where('data.attributes.special_offer', 'BOGOF')
                     ->has('data.relationships.phone_lines', 0);
             });
 
@@ -278,7 +240,6 @@ class CompetitionTest extends TestCase
             'start' => $updatedStart,
             'end' => $updatedEnd,
             'max_entries' => 5,
-            'special_offer' => 'BOGOF'
         ])
             ->assertOk()
             ->assertJson(function (AssertableJson $json) use($competition, $updatedStart, $updatedEnd) {
@@ -289,7 +250,6 @@ class CompetitionTest extends TestCase
                     ->where('data.attributes.is_open', false)
                     ->where('data.attributes.start', $updatedStart->toIso8601String())
                     ->where('data.attributes.end', $updatedEnd->toIso8601String())
-                    ->where('data.attributes.special_offer', 'BOGOF')
                     ->has('data.relationships.phone_lines', 0);
             });
 
