@@ -26,8 +26,8 @@ Parameters:
 
   CertificateArn:
     Type: String
-    Default: arn:aws:acm:eu-west-2:756455520547:certificate/edd361d1-f35c-4a72-afdc-4c0866157d17
-    Description: ARN of the SSL certificate for multi-tenant.viveri-tech.com
+    Default: arn:aws:acm:eu-west-2:756455520547:certificate/726a4d57-7ffe-4eb6-b438-af36eb7fea2a
+    Description: ARN of the SSL certificate for tenant.viveri-tech.com
 
   HostedZoneId:
     Type: String
@@ -41,7 +41,7 @@ Parameters:
 
   NginxImageTag:
     Type: String
-    Default: multi-tenant-20251202-135543
+    Default: multi-tenant-20251202-153603
     Description: Tag for the Nginx container image
 
 Resources:
@@ -888,7 +888,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: multi-tenant.viveri-tech.com
+      Name: tenant.viveri-tech.com
       Type: CNAME
       TTL: 300
       ResourceRecords:
