@@ -842,7 +842,10 @@ Resources:
 
   WorkerECSService:
     Type: AWS::ECS::Service
-    DependsOn: WorkerTaskDefinition
+    DependsOn: 
+      - WorkerTaskDefinition
+      - MySQLECSService
+      - RedisECSService
     Properties:
       Cluster: !Ref ECSCluster
       LaunchType: FARGATE
