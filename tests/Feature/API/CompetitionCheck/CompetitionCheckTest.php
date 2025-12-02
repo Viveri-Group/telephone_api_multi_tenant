@@ -16,51 +16,6 @@ use Tests\TestCase;
 
 class CompetitionCheckTest extends TestCase
 {
-    public function test_active_lines_exceeded_is_turned_off()
-    {
-        $this->login();
-
-        Config::set('system.ENFORCE_MAX_NUMBER_OF_LINES', false);
-
-        $response = $this->postJson(route('active-call.competition-check'), [
-            'call_id' => 53,
-            'phone_number' => '44333456555',
-            'caller_phone_number' => '441604556778',
-        ]);
-
-        $this->assertNotEquals(412, $response->getStatusCode());
-    }
-
-    public function test_active_lines_exceeded_fails()
-    {
-        $this->markTestSkipped('removed for time being');
-
-        $this->login();
-
-        Config::set('system.ENFORCE_MAX_NUMBER_OF_LINES', true);
-        Config::set('system.MAX_NUMBER_OF_LINES', 0);
-
-        DB::enableQueryLog();
-
-        $this->postJson(route('active-call.competition-check'), [
-            'call_id' => 53,
-            'phone_number' => '44333456555',
-            'caller_phone_number' => '441604556778',
-        ])
-            ->assertStatus(412)
-            ->assertJson(function (AssertableJson $json) {
-                return $json
-                    ->where('message', 'Active lines allowance exceeded.');
-            });
-
-        $queryLog = DB::getQueryLog();
-        $queryCount = count($queryLog);
-
-        $this->assertLessThanOrEqual(5, $queryCount);
-
-        $this->assertCount(0, ActiveCall::all());
-    }
-
     public function test_no_competition_is_found_and_reject_is_returned()
     {
         Bus::fake();

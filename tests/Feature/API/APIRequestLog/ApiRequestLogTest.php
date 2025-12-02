@@ -145,7 +145,7 @@ class ApiRequestLogTest extends TestCase
             'file' => $file,
             'bar' => 'baz',
             'name' => 'My New Audio',
-            'type' => CompetitionAudioType::PRE_EVENT->name,
+            'type' => CompetitionAudioType::COMPETITION_CLOSED->name,
             'audio_type' => 'competition'
         ])->assertCreated();
 
