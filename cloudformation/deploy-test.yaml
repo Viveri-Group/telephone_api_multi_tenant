@@ -41,7 +41,7 @@ Parameters:
 
   NginxImageTag:
     Type: String
-    Default: multi-tenant-20251124-153012
+    Default: multi-tenant-20251202-135543
     Description: Tag for the Nginx container image
 
 Resources:
