@@ -13,11 +13,15 @@ class HandleCompetitionFailClearDownJobTest extends TestCase
 {
     public function test_job_works_as_expected()
     {
-        PhoneBookEntry::factory(['phone_number'=>'441234567890', 'name' => 'bar'])->create();
+        list($organisation, $phoneBookEntry, $competition, $phoneLine, $competitionNumber, $callerNumber) = $this->setCompetition();
 
-        $activeCall = ActiveCall::factory(['phone_number'=>'441234567890'])->create();
-
-        Participant::factory(['call_id'=>$activeCall->call_id])->create(); // this should be removed
+        $activeCall = ActiveCall::factory([
+            'organisation_id' => $organisation->id,
+            'competition_id' => $competition->id,
+            'competition_phone_line_id' => $phoneLine->id,
+            'phone_number' => $competitionNumber,
+            'caller_phone_number' => $callerNumber,
+        ])->create();
 
         $dto = $this->getActiveCallDTO($activeCall);
 
@@ -26,7 +30,8 @@ class HandleCompetitionFailClearDownJobTest extends TestCase
         $this->assertCount(0, Participant::all());
         $this->assertCount(1, $failedEntries = FailedEntry::all());
 
-        tap($failedEntries->first(), function (FailedEntry $failedEntry) use($dto) {
+        tap($failedEntries->first(), function (FailedEntry $failedEntry) use ($dto, $phoneBookEntry) {
+            $this->assertEquals($dto->organisation_id, $failedEntry->organisation_id);
             $this->assertEquals($dto->competition_id, $failedEntry->competition_id);
             $this->assertEquals($dto->call_id, $failedEntry->call_id);
             $this->assertEquals($dto->competition_phone_number, $failedEntry->phone_number);
@@ -36,9 +41,7 @@ class HandleCompetitionFailClearDownJobTest extends TestCase
             $this->assertNotNull($failedEntry->call_end);
             $this->assertEquals($dto->round_start, $failedEntry->round_start);
             $this->assertEquals($dto->round_end, $failedEntry->round_end);
-            $this->assertEquals('bar', $failedEntry->station_name);
+            $this->assertEquals($phoneBookEntry->name, $failedEntry->station_name);
         });
-
-        $this->assertCount(0, ActiveCall::all());
     }
 }

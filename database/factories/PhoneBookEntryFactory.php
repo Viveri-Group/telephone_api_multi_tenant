@@ -17,6 +17,7 @@ class PhoneBookEntryFactory extends Factory
         return [
             'organisation_id' => Organisation::factory(),
             'phone_number' => $this->faker->numerify('44##########'),
+            'name' => $this->faker->firstName(),
 
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
