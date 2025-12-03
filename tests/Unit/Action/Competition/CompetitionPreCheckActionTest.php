@@ -24,8 +24,6 @@ class CompetitionPreCheckActionTest extends TestCase
     {
         parent::setUp();
 
-        Bus::fake();
-
         $this->setFileDefaults();
 
         $this->login();

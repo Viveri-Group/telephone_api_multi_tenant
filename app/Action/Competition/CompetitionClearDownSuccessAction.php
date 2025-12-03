@@ -17,11 +17,11 @@ class CompetitionClearDownSuccessAction
         $phoneBookEntry = (new PhoneBookLookupAction())->handle($activeCallDTO->competition_phone_number);
 
         $participant = Participant::create([
+            'organisation_id' => $activeCallDTO->organisation_id,
+            'competition_id' => $activeCallDTO->competition_id,
             'call_id' => $activeCallDTO->call_id,
             'call_start' => $activeCallDTO->created_at,
             'call_end' => $activeCallDTO->call_end,
-            'competition_id' => $activeCallDTO->competition_id,
-            'competition_phone_line_id' => $activeCallDTO->competition_phone_line_id,
             'competition_phone_number' => $activeCallDTO->competition_phone_number,
             'telephone' => $activeCallDTO->caller_phone_number,
             'sms_offer_accepted' => $smsOfferAccepted,
@@ -37,7 +37,7 @@ class CompetitionClearDownSuccessAction
                 'caller_number' => $activeCallDTO->caller_phone_number,
             ],
             [
-                'entry_count' => DB::raw('entry_count + 1')
+                'total_entry_count' => DB::raw('total_entry_count + 1')
             ]
         );
 

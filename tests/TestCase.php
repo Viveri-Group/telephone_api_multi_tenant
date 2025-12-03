@@ -5,7 +5,11 @@ namespace Tests;
 use App\DTO\ActiveCall\ActiveCallDTO;
 use App\Enums\CompetitionAudioType;
 use App\Models\ActiveCall;
+use App\Models\Competition;
+use App\Models\CompetitionPhoneLine;
 use App\Models\FileDefault;
+use App\Models\Organisation;
+use App\Models\PhoneBookEntry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -22,6 +26,32 @@ abstract class TestCase extends BaseTestCase
         $this->withoutVite();
 
         Http::preventStrayRequests();
+    }
+
+    protected function setCompetition(): array
+    {
+        $organisation = Organisation::factory()->create();
+
+        $competitionNumber = '0333456555';
+
+        $phoneBookEntry = PhoneBookEntry::factory(['phone_number' => $competitionNumber, 'organisation_id' => $organisation->id])->create();
+
+        $competition = Competition::factory(['start' => now()->subDays(2), 'end' => now()->addDay(), 'max_entries' => 4, 'organisation_id' => $organisation->id])
+            ->hasPhoneLines(['phone_number' => $competitionNumber, 'organisation_id' => $organisation->id])
+            ->create();
+
+        $phoneLine = CompetitionPhoneLine::first();
+
+        $callerNumber = '441604464237';
+
+        return [
+            $organisation,
+            $phoneBookEntry,
+            $competition,
+            $phoneLine,
+            $competitionNumber,
+            $callerNumber
+        ];
     }
 
     protected function login(array $userDetails = []): User
