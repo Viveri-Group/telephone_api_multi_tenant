@@ -17,21 +17,21 @@ class GetCompetitionDefaultAudioTest extends TestCase
         $this->organisation = Organisation::factory()->create();
         $this->organisationB = Organisation::factory()->create();
 
-        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 1, 'type' => CompetitionAudioType::INTRO]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 2, 'type' => CompetitionAudioType::CLI_READOUT_NOTICE]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 3, 'type' => CompetitionAudioType::DTMF_MENU]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 4, 'type' => CompetitionAudioType::DTMF_SUCCESS]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 5, 'type' => CompetitionAudioType::DTMF_FAIL]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 6, 'type' => CompetitionAudioType::COMPETITION_CLOSED]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 7, 'type' => CompetitionAudioType::TOO_MANY_ENTRIES]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 1, 'type' => CompetitionAudioType::INTRO->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 2, 'type' => CompetitionAudioType::CLI_READOUT_NOTICE->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 3, 'type' => CompetitionAudioType::DTMF_MENU->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 4, 'type' => CompetitionAudioType::DTMF_SUCCESS->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 5, 'type' => CompetitionAudioType::DTMF_FAIL->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 6, 'type' => CompetitionAudioType::COMPETITION_CLOSED->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 7, 'type' => CompetitionAudioType::TOO_MANY_ENTRIES->name]);
 
-        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 20, 'type' => CompetitionAudioType::INTRO]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 21, 'type' => CompetitionAudioType::CLI_READOUT_NOTICE]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 22, 'type' => CompetitionAudioType::DTMF_MENU]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 23, 'type' => CompetitionAudioType::DTMF_SUCCESS]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 24, 'type' => CompetitionAudioType::DTMF_FAIL]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 25, 'type' => CompetitionAudioType::COMPETITION_CLOSED]);
-        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 26, 'type' => CompetitionAudioType::TOO_MANY_ENTRIES]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 20, 'type' => CompetitionAudioType::INTRO->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 21, 'type' => CompetitionAudioType::CLI_READOUT_NOTICE->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 22, 'type' => CompetitionAudioType::DTMF_MENU->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 23, 'type' => CompetitionAudioType::DTMF_SUCCESS->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 24, 'type' => CompetitionAudioType::DTMF_FAIL->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 25, 'type' => CompetitionAudioType::COMPETITION_CLOSED->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 26, 'type' => CompetitionAudioType::TOO_MANY_ENTRIES->name]);
     }
 
     public function test_default_audio()

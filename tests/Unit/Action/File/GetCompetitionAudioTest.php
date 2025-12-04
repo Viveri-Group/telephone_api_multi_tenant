@@ -17,7 +17,15 @@ class GetCompetitionAudioTest extends TestCase
     {
         parent::setUp();
 
-        $this->organisation = Organisation::factory()->create();
+        list($organisation, $phoneBookEntry, $competition, $phoneLine, $competitionNumber, $callerNumber) = $this->setCompetition();
+
+        $this->organisation = $organisation;
+
+        $this->organisationB = Organisation::factory()->create();
+
+        $this->competition = $competition;
+
+        $this->phoneLine = $phoneLine;
 
         FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 1, 'type' => CompetitionAudioType::INTRO->name]);
         FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 2, 'type' => CompetitionAudioType::CLI_READOUT_NOTICE->name]);
@@ -28,28 +36,37 @@ class GetCompetitionAudioTest extends TestCase
         FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 7, 'type' => CompetitionAudioType::COMPETITION_CLOSED->name]);
         FileDefault::factory()->create(['organisation_id' => $this->organisation->id, 'external_id' => 8, 'type' => CompetitionAudioType::TOO_MANY_ENTRIES->name]);
 
-        $this->competition = Competition::factory()
-            ->hasPhoneLines(['phone_number' => '0333111111'])
-            ->create();
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 20, 'type' => CompetitionAudioType::INTRO->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 21, 'type' => CompetitionAudioType::CLI_READOUT_NOTICE->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 22, 'type' => CompetitionAudioType::DTMF_MENU->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 23, 'type' => CompetitionAudioType::DTMF_SUCCESS->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 24, 'type' => CompetitionAudioType::DTMF_FAIL->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 25, 'type' => CompetitionAudioType::COMPETITION_CLOSED->name]);
+        FileDefault::factory()->create(['organisation_id' => $this->organisationB->id, 'external_id' => 26, 'type' => CompetitionAudioType::TOO_MANY_ENTRIES->name]);
+
+//        $this->competition = Competition::factory()
+//            ->hasPhoneLines(['phone_number' => '0333111111'])
+//            ->create();
     }
 
     public function test_phone_line_audio_is_set()
     {
+
         FileUpload::factory()->create([
             'external_id' => 999,
             'competition_id' => null,
-            'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
+            'competition_phone_line_id' => $this->phoneLine->id,
             'type' => CompetitionAudioType::INTRO->name,
         ]);
 
         FileUpload::factory()->create([
             'external_id' => 2000,
             'competition_id' => null,
-            'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
+            'competition_phone_line_id' => $this->phoneLine->id,
             'type' => CompetitionAudioType::DTMF_FAIL->name,
         ]);
 
-        $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->competition->phoneLines()->first());
+        $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->phoneLine);
 
         $this->assertEqualsCanonicalizing(
             [
@@ -79,7 +96,7 @@ class GetCompetitionAudioTest extends TestCase
             'type' => CompetitionAudioType::DTMF_FAIL->name,
         ]);
 
-        $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->competition->phoneLines()->first());
+        $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->phoneLine);
 
         $this->assertEqualsCanonicalizing(
             [
@@ -95,7 +112,7 @@ class GetCompetitionAudioTest extends TestCase
 
     public function test_default_audio_is_returned()
     {
-        $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->competition->phoneLines()->first());
+        $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->phoneLine);
 
         $this->assertEqualsCanonicalizing(
             [
@@ -121,7 +138,7 @@ class GetCompetitionAudioTest extends TestCase
         FileUpload::factory()->create([
             'external_id' => 600,
             'competition_id' => $this->competition->id,
-            'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
+            'competition_phone_line_id' => $this->phoneLine->id,
             'type' => CompetitionAudioType::DTMF_FAIL->name,
         ]);
 
@@ -132,7 +149,7 @@ class GetCompetitionAudioTest extends TestCase
             'type' => CompetitionAudioType::INTRO->name,
         ]);
 
-        $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->competition->phoneLines()->first());
+        $audioFiles = (new GetCompetitionAudioAction(CompetitionAudioType::names()))->handle($this->phoneLine);
 
         $this->assertEqualsCanonicalizing(
             [
@@ -158,14 +175,14 @@ class GetCompetitionAudioTest extends TestCase
         FileUpload::factory()->create([
             'external_id' => 999,
             'competition_id' => null,
-            'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
+            'competition_phone_line_id' => $this->phoneLine->id,
             'type' => CompetitionAudioType::INTRO->name,
         ]);
 
         FileUpload::factory()->create([
             'external_id' => 888,
             'competition_id' => null,
-            'competition_phone_line_id' => $this->competition->phoneLines()->first()->id,
+            'competition_phone_line_id' => $this->phoneLine->id,
             'type' => CompetitionAudioType::COMPETITION_CLOSED->name,
         ]);
 
