@@ -21,7 +21,6 @@ class CompetitionWinnerFactory extends Factory
             'call_id' => $this->faker->numerify('######'),
             'number_of_entries' => $this->faker->randomDigit(),
             'round_hash' => 'round_hash_value',
-            'phone_line_id' => CompetitionPhoneLine::factory(),
             'competition_phone_number' => $this->faker->numerify('############'),
             'call_start' => now()->subDay(),
             'call_end' => now()->subDay()->addMinute(),

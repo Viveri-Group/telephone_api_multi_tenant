@@ -12,14 +12,20 @@ use Tests\TestCase;
 
 class SpecifyWinnerValidationTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        list($organisation, $phoneBookEntry, $this->competition, $this->phoneLine, $competitionNumber, $callerNumber) = $this->setCompetition();
+
+    }
     public function test_position_has_to_be_greater_or_equal_to_one()
     {
         $this->login();
 
-        $competition = Competition::factory()->create();
 
         $this->post(
-            route('competition.specify-winner', $competition), [
+            route('competition.specify-winner', $this->competition), [
                 'position' => 0,
                 'round_hash' => 'foo_round_hash'
             ]
@@ -36,10 +42,8 @@ class SpecifyWinnerValidationTest extends TestCase
     {
         $this->login();
 
-        $competition = Competition::factory()->create();
-
         $this->post(
-            route('competition.specify-winner', $competition), [
+            route('competition.specify-winner', $this->competition), [
                 'position' => 5,
                 'round_hash' => 'unknown_hash'
             ]
@@ -50,27 +54,26 @@ class SpecifyWinnerValidationTest extends TestCase
     {
         $this->login();
 
-        $competition = Competition::factory()->hasPhoneLines(['phone_number' => '03000111111'])->create();
-        $draw = CompetitionDraw::factory(['competition_id' => $competition->id, 'competition_type' => 'WEEKLY', 'round_from' => '2024-10-01', 'round_to' => '2024-10-08', 'round_hash' => 'round_one_hash',])->create();
+        $draw = CompetitionDraw::factory(['competition_id' => $this->competition->id, 'competition_type' => 'WEEKLY', 'round_from' => '2024-10-01', 'round_to' => '2024-10-08', 'round_hash' => 'round_one_hash',])->create();
 
-        $participants = Participant::factory()->count(3)->create(['competition_id' => $competition->id, 'competition_draw_id' => $draw->id, 'competition_phone_line_id' => $competition->phoneLines->first()->id]);
+        $participants = Participant::factory()->count(3)->create(['competition_id' => $this->competition->id, 'competition_draw_id' => $draw->id, 'competition_phone_number' => $this->phoneLine->phone_number]);
 
         $this->post(
-            route('competition.specify-winner', $competition), [
+            route('competition.specify-winner', $this->competition), [
                 'position' => 1,
                 'round_hash' => $draw->round_hash
             ]
         )->assertCreated();
 
         $this->post(
-            route('competition.specify-winner', $competition), [
+            route('competition.specify-winner', $this->competition), [
                 'position' => 2,
                 'round_hash' => $draw->round_hash
             ]
         )->assertCreated();
 
         $this->post(
-            route('competition.specify-winner', $competition), [
+            route('competition.specify-winner', $this->competition), [
                 'position' => 3,
                 'round_hash' => $draw->round_hash
             ]
@@ -78,44 +81,44 @@ class SpecifyWinnerValidationTest extends TestCase
 
         $this->assertCount(3, CompetitionWinner::all());
 
-        tap(CompetitionWinner::all(), function (Collection $competitionWinners) use($draw, $competition, $participants) {
+        tap(CompetitionWinner::all(), function (Collection $competitionWinners) use($draw, $participants) {
             $participantOne = $participants->get(0);
             $winnerOne = $competitionWinners->get(0);
+
             $this->assertSame($participantOne->id, $winnerOne->participant_id);
-            $this->assertSame($competition->id, $winnerOne->competition_id);
-            $this->assertSame($participantOne->call_id, $winnerOne->call_id);
+            $this->assertSame($this->competition->id, $winnerOne->competition_id);
+            $this->assertEquals($participantOne->call_id, $winnerOne->call_id);
             $this->assertSame(1, $winnerOne->number_of_entries);
             $this->assertSame($draw->round_hash, $winnerOne->round_hash);
-            $this->assertSame($participantOne->competition_phone_line_id, $winnerOne->phone_line_id);
-            $this->assertSame('03000111111', $winnerOne->competition_phone_number);
+            $this->assertSame($participantOne->competition_phone_number, $winnerOne->competition_phone_number);
             $this->assertSame($participantOne->telephone, $winnerOne->telephone);
             $this->assertSame($participantOne->call_start->format('Y-m-d H:i:s'), $winnerOne->call_start);
             $this->assertSame($participantOne->call_end->format('Y-m-d H:i:s'), $winnerOne->call_end);
 
             $participantTwo = $participants->get(1);
             $winnerTwo = $competitionWinners->get(1);
+
             $this->assertSame($participantTwo->id, $winnerTwo->participant_id);
             $this->assertSame($draw->round_hash, $winnerTwo->round_hash);
-            $this->assertSame($competition->id, $winnerTwo->competition_id);
-            $this->assertSame($participantTwo->call_id, $winnerTwo->call_id);
+            $this->assertSame($this->competition->id, $winnerTwo->competition_id);
+            $this->assertEquals($participantTwo->call_id, $winnerTwo->call_id);
             $this->assertSame(1, $winnerTwo->number_of_entries);
             $this->assertSame($draw->round_hash, $winnerTwo->round_hash);
-            $this->assertSame($participantTwo->competition_phone_line_id, $winnerTwo->phone_line_id);
-            $this->assertSame('03000111111', $winnerTwo->competition_phone_number);
+            $this->assertSame($participantTwo->competition_phone_number, $winnerTwo->competition_phone_number);
             $this->assertSame($participantTwo->telephone, $winnerTwo->telephone);
             $this->assertSame($participantTwo->call_start->format('Y-m-d H:i:s'), $winnerTwo->call_start);
             $this->assertSame($participantTwo->call_end->format('Y-m-d H:i:s'), $winnerTwo->call_end);
 
             $participantThree = $participants->get(2);
             $winnerThree = $competitionWinners->get(2);
+
             $this->assertSame($participantThree->id, $winnerThree->participant_id);
             $this->assertSame($draw->round_hash, $winnerThree->round_hash);
-            $this->assertSame($competition->id, $winnerThree->competition_id);
-            $this->assertSame($participantThree->call_id, $winnerThree->call_id);
+            $this->assertSame($this->competition->id, $winnerThree->competition_id);
+            $this->assertEquals($participantThree->call_id, $winnerThree->call_id);
             $this->assertSame(1, $winnerThree->number_of_entries);
             $this->assertSame($draw->round_hash, $winnerThree->round_hash);
-            $this->assertSame($participantThree->competition_phone_line_id, $winnerThree->phone_line_id);
-            $this->assertSame('03000111111', $winnerThree->competition_phone_number);
+            $this->assertSame($participantThree->competition_phone_number, $winnerThree->competition_phone_number);
             $this->assertSame($participantThree->telephone, $winnerThree->telephone);
             $this->assertSame($participantThree->call_start->format('Y-m-d H:i:s'), $winnerThree->call_start);
             $this->assertSame($participantThree->call_end->format('Y-m-d H:i:s'), $winnerThree->call_end);

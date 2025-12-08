@@ -17,9 +17,11 @@ class GetWinnerTest extends TestCase
 
         $this->login();
 
-        $this->competitionA = Competition::factory(['name' => 'Test Competition'])->hasPhoneLines(['phone_number' => '03000111111'])->create();
-        $this->draw = CompetitionDraw::factory()->create(['competition_id' => $this->competitionA->id, 'round_hash'=>'round_hash_foo', 'round_from' => '2024-01-01', 'round_to' => '2024-01-10']);
-        $participants = Participant::factory(['competition_id' => $this->competitionA->id, 'competition_phone_line_id' => $this->competitionA->phoneLines()->first()->id])->count(30)->create();
+        list($organisation, $phoneBookEntry, $this->competition, $phoneLine, $competitionNumber, $callerNumber) = $this->setCompetition();
+
+        $this->draw = CompetitionDraw::factory()->create(['competition_id' => $this->competition->id, 'round_hash'=>'round_hash_foo', 'round_from' => $this->competition->start->format('Y-m-d'), 'round_to' => $this->competition->end->format('Y-m-d')]);
+
+        $participants = Participant::factory(['competition_id' => $this->competition->id, 'competition_phone_number' => $phoneLine->phone_number])->count(30)->create();
 
         $this->winningParticipant = $participants->get(5);
 
@@ -27,14 +29,16 @@ class GetWinnerTest extends TestCase
             'participant_id' => $this->winningParticipant->id,
             'competition_id' => $this->winningParticipant->competition_id,
             'round_hash' => $this->draw->round_hash,
-            'phone_line_id' => $this->winningParticipant->competition_phone_line_id,
+            'competition_phone_number' => $this->winningParticipant->competition_phone_number,
             'telephone' => $this->winningParticipant->telephone,
         ]);
+
+        $b = $this->winner;
     }
 
     public function test_winner_can_be_retrieved()
     {
-        $this->get(route('competition.get-winner', $this->competitionA))
+        $this->get(route('competition.get-winner', $this->competition))
             ->assertOk()
             ->assertJson(function (AssertableJson $json) {
                 return $json
@@ -47,7 +51,6 @@ class GetWinnerTest extends TestCase
                     ->where('data.attributes.round_hash', $this->winner->round_hash)
                     ->where('data.attributes.round_from', $this->draw->round_from)
                     ->where('data.attributes.round_to', $this->draw->round_to)
-                    ->where('data.attributes.phone_line_id', $this->winner->phone_line_id)
                     ->where('data.attributes.competition_phone_number', $this->winner->competition_phone_number)
                     ->where('data.attributes.telephone', $this->winner->telephone)
                     ->where('data.attributes.call_start', $this->winner->call_start->format('Y-m-d H:i:s'))
