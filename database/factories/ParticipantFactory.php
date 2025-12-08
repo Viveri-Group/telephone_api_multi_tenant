@@ -18,7 +18,7 @@ class ParticipantFactory extends Factory
         return [
             'organisation_id' => Organisation::factory(),
             'competition_id' => Competition::factory(),
-            'call_id' => $this->faker->numerify('####'),
+            'call_id' => (int) $this->faker->numerify('####'),
             'call_start' => now(),
             'call_end' => now()->addSeconds(10),
             'competition_phone_number' => $this->faker->numerify('############'),

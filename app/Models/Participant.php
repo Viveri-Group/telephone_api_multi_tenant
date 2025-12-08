@@ -18,6 +18,7 @@ class Participant extends Model
         'round_start' => 'datetime',
         'round_end' => 'datetime',
         'is_free_entry' => 'boolean',
+        'sms_offer_accepted' => 'boolean',
     ];
 
     protected static function boot(): void

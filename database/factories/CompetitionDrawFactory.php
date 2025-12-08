@@ -14,7 +14,7 @@ class CompetitionDrawFactory extends Factory
     public function definition(): array
     {
         return [
-            'competition_id' => Competition::Factory()->state(['type' => 'WEEKLY']),
+            'competition_id' => Competition::Factory(),
             'round_from' => '2020-01-01',
             'round_to' => '2020-01-08',
             'round_hash' => 'FOO',
