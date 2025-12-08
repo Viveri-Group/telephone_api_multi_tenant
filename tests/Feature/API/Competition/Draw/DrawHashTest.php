@@ -21,7 +21,6 @@ class DrawHashTest extends TestCase
 
         $this->competitionA = Competition::factory([
             'name' => 'Test Competition',
-            'type' => 'WHOLE_COMPETITION',
             'start' => now()->subDays(7),
             'end' => now()->subMinute(),
             ])->create();

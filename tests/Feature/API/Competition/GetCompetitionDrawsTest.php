@@ -13,9 +13,9 @@ class GetCompetitionDrawsTest extends TestCase
     {
         $this->login();
 
-        $competition = Competition::factory(['type'=>'WEEKLY'])->create();
-        $drawOne = CompetitionDraw::factory()->create(['competition_id' => $competition->id, 'round_hash' => 'round_1', 'competition_type'=>'WEEKLY']);
-        $drawTwo = CompetitionDraw::factory()->create(['competition_id' => $competition->id, 'round_hash' => 'round_2', 'competition_type'=>'WEEKLY']);
+        $competition = Competition::factory([])->create();
+        $drawOne = CompetitionDraw::factory()->create(['competition_id' => $competition->id, 'round_hash' => 'round_1']);
+        $drawTwo = CompetitionDraw::factory()->create(['competition_id' => $competition->id, 'round_hash' => 'round_2']);
 
         $this->get(route('competition.get-draws', [$competition]))
             ->assertOk()
@@ -42,7 +42,7 @@ class GetCompetitionDrawsTest extends TestCase
     {
         $this->login();
 
-        $competition = Competition::factory(['type'=>'WEEKLY'])->create();
+        $competition = Competition::factory([])->create();
 
         $this->get(route('competition.get-draws', [$competition]))
             ->assertOk()
